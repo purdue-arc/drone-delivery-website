@@ -1,19 +1,14 @@
 import { Title } from "solid-start";
 import Counter from "~/components/Counter";
 
-// import { Cesium } from "cesium";
+import { Viewer } from "cesium";
 import { onMount } from "solid-js";
-
-import { Map } from "maplibre-gl";
+import "./index.css";
+import "cesium/Source/widgets/widgets.css";
 
 export default function Home() {
   onMount(() => {
-    var map = new Map({
-      container: 'map',
-      style: 'https://demotiles.maplibre.org/style.json', // stylesheet location
-      center: [-74.5, 40], // starting position [lng, lat]
-      zoom: 9, // starting zoom
-    });
+    const viewer = new Viewer("cesiumContainer");
   })
 
   return (
@@ -21,7 +16,7 @@ export default function Home() {
       <Title>Hello World</Title>
       <h1>Hello world! </h1>
       <Counter />
-      <div id="map" style={{height:"800px", width: '800px'}}></div>
+      <div id="cesiumContainer"></div>
       <p>
         Visit{" "}
         <a href="https://start.solidjs.com" target="_blank">
