@@ -1,27 +1,43 @@
-# SolidStart
+# Drone Delivery Website
 
-Everything you need to build a Solid project, powered by [`solid-start`](https://start.solidjs.com);
+This is a [`solid-start`](https://start.solidjs.com) website intended to handle drone operations including:
 
-## Creating a project
+* Manually contolling the drone
+* Operating a network of drones
+* Drone delivery operations
+* Monitoring drone operations
 
-```bash
-# create a new project in the current directory
-npm init solid@latest
-
-# create a new project in my-app
-npm init solid@latest my-app
-```
+It uses CesiumJS as a geospatial rendering library.
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Cloning
 
-```bash
-npm run dev
+This project is meant to be run in a Docker container so developing it and deploying it is easier. If you are running Windows, make sure to clone this repository in your WSL distro as it will run faster than if you clone it on Windows.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+### Access Tokens
+
+CesiumJS requires that you have an access token to be able to access geospatial elements through their service Cesium Ion such as satelite imagery. We don't want to leak that token so that other people can use our , so we store it in an environment variable in a `.env.local` file that the [Vite reads](https://vitejs.dev/guide/env-and-mode.html) from and that is not tracked by git (see `.gitignore`). Copy `.env.local.sample` to `.env.local` by running 
+
 ```
+cp .env.local.sample .env.local
+``` 
+
+and then fill in the access token variable (no quotes surrounding the token).
+
+### Start the server
+
+Make sure you have Docker Desktop installed.
+
+To start the Docker container and development server inside of it, run
+
+```
+docker compose up
+```
+
+Monitor the logs to make sure everything is running smoothly.
+
+To stop the container, press `Ctrl/Cmd C`
 
 ## Building
 

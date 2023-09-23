@@ -1,13 +1,16 @@
 import * as Cesium from 'cesium';
 import { Index, createSignal, onMount } from "solid-js";
 import "./index.css";
-import "cesium/Source/widgets/widgets.css";
+import "cesium/Build/Cesium/Widgets/widgets.css";
+const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
 export default function Home() {
 
   const [points, setPoints] = createSignal([] as string[])
 
   onMount(() => {
+    Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN
+
     const viewer = new Cesium.Viewer("cesiumContainer", {
       selectionIndicator: false,
       infoBox: false,
