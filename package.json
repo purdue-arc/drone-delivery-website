@@ -7,6 +7,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@suid/vite-plugin": "^0.1.4",
     "@types/node": "^18.11.18",
     "cesium": "^1.103.0",
     "esbuild": "^0.14.54",
@@ -19,6 +20,8 @@
   "dependencies": {
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
+    "@suid/icons-material": "^0.6.9",
+    "@suid/material": "^0.14.2",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
     "maplibre-gl": "^2.4.0",
