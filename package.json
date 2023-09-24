@@ -1,5 +1,5 @@
 {
-  "name": "Drone Delivery Website",
+  "name": "drone_delivery_website",
   "scripts": {
     "dev": "solid-start dev",
     "build": "solid-start build",
