@@ -27,11 +27,11 @@ export default function Root() {
         <Suspense>
           <ErrorBoundary>
             <SideNav />
-            <A href="/">Index</A>
-            <A href="/about">About</A>
-            <Routes>
-              <FileRoutes />
-            </Routes>
+            <div style={{"padding-left": "65px"}}>
+              <Routes>
+                <FileRoutes />
+              </Routes>
+            </div>
           </ErrorBoundary>
         </Suspense>
         <Scripts />
