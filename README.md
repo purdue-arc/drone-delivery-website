@@ -7,13 +7,21 @@ This is a [`solid-start`](https://start.solidjs.com) website intended to handle 
 * Drone delivery operations
 * Monitoring drone operations
 
-It uses CesiumJS as a geospatial rendering library.
+It uses [CesiumJS](https://cesium.com/learn/cesiumjs-learn/) as a geospatial rendering library.
 
 ## Developing
 
 ### Cloning
 
 This project is meant to be run in a Docker container so developing it and deploying it is easier. If you are running Windows, make sure to clone this repository in your WSL distro as it will run faster than if you clone it on Windows.
+
+### Opening the [dev container](https://code.visualstudio.com/docs/devcontainers/containers)
+
+If you are using VSCode, click "Reopen in container" when the notification appears in the lower right when you open the repository. 
+
+If you are not using VSCode, you should start the container by running `docker compose up` in the `.devcontainer` folder and connect to the repository inside the container. 
+
+You should connect to the repository inside the container so that you are using the NodeJS and NPM inside the container to make changes to the repository. Although you could install new Node modules with your local installation, we want to avoid that as it could break things. 
 
 ### Access Tokens
 
@@ -24,20 +32,6 @@ cp .env.local.sample .env.local
 ``` 
 
 and then fill in the access token variable (no quotes surrounding the token).
-
-### Start the server
-
-Make sure you have Docker Desktop installed.
-
-To start the Docker container and development server inside of it, run
-
-```
-docker compose up
-```
-
-Monitor the logs to make sure everything is running smoothly.
-
-To stop the container, press `Ctrl/Cmd C`
 
 ## Building
 
