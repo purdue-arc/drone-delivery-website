@@ -1,5 +1,5 @@
 {
-  "name": "Solid",
+  "name": "Drone Delivery Website",
   "scripts": {
     "dev": "solid-start dev",
     "build": "solid-start build",
@@ -19,6 +19,7 @@
   "dependencies": {
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
+    "@supabase/supabase-js": "^2.36.0",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
     "maplibre-gl": "^2.4.0",
