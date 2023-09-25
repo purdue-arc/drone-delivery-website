@@ -1,5 +1,5 @@
 // @refresh reload
-import { Suspense } from "solid-js";
+import {For, Suspense} from "solid-js";
 import {
   A,
   Body,
@@ -13,6 +13,7 @@ import {
   Title,
 } from "solid-start";
 import "./root.css";
+import SideNav from "~/components/SideNav";
 
 export default function Root() {
   return (
@@ -25,11 +26,12 @@ export default function Root() {
       <Body>
         <Suspense>
           <ErrorBoundary>
-            <A href="/">Index</A>
-            <A href="/about">About</A>
-            <Routes>
-              <FileRoutes />
-            </Routes>
+            <SideNav />
+            <div style={{"padding-left": "65px"}}>
+              <Routes>
+                <FileRoutes />
+              </Routes>
+            </div>
           </ErrorBoundary>
         </Suspense>
         <Scripts />
