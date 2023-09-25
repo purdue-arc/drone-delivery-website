@@ -1,4 +1,4 @@
-import {Drawer, List, ListItem, ListItemButton, ListItemIcon, styled, type Theme} from "@suid/material";
+import {Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, type Theme} from "@suid/material";
 import {type Accessor, children, Component, createContext, createSignal, useContext} from "solid-js";
 import FlightIcon from '@suid/icons-material/Flight';
 import MapIcon from '@suid/icons-material/Map';
@@ -76,9 +76,7 @@ function NavRow({href, label, icon}: {href: string, label: string, icon: Compone
         >
           {safeIcon()}
         </ListItemIcon>
-        <div>{label}</div>
-        {/*TODO: replace div w/ below material component once new suid release published, fixing component*/}
-        {/*<ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />*/}
+        <ListItemText primary={label} sx={{ opacity: isOpen() ? 1 : 0 }} />
       </ListItemButton>
     </ListItem>
   );
