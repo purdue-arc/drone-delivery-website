@@ -1,21 +1,13 @@
 // @refresh reload
-import {For, Suspense} from "solid-js";
-import {
-  A,
-  Body,
-  ErrorBoundary,
-  FileRoutes,
-  Head,
-  Html,
-  Meta,
-  Routes,
-  Scripts,
-  Title,
-} from "solid-start";
+import {Suspense} from "solid-js";
+import {Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title,} from "solid-start";
 import "./root.css";
 import SideNav from "~/components/SideNav";
+import {Box, useTheme} from "@suid/material";
 
 export default function Root() {
+  const theme = useTheme();
+
   return (
     <Html lang="en">
       <Head>
@@ -27,11 +19,11 @@ export default function Root() {
         <Suspense>
           <ErrorBoundary>
             <SideNav />
-            <div style={{"padding-left": "65px"}}>
+            <Box sx={{ paddingLeft: theme.spacing(7) }}> {/* TODO: This is JUST a few pixels off */}
               <Routes>
                 <FileRoutes />
               </Routes>
-            </div>
+            </Box>
           </ErrorBoundary>
         </Suspense>
         <Scripts />
