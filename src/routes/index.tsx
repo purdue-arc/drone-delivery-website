@@ -1,7 +1,8 @@
 import * as Cesium from 'cesium';
-import { Index, createSignal, onMount } from "solid-js";
+import {createSignal, Index, onMount} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
+
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
 export default function Home() {
@@ -18,13 +19,14 @@ export default function Home() {
       timeline: false,
       sceneModePicker: false,
       homeButton: false,
-      animation: false
+      animation: false,
+      shouldAnimate: true,
     });
-    
+
     if (!viewer.scene.pickPositionSupported) {
       window.alert("This browser does not support pickPosition.");
     }
-    
+
     viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
     );
@@ -94,7 +96,7 @@ export default function Home() {
         activeShapePoints.push(earthPosition);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    
+
     // Mouse move handler to change the position of the floating point
     handler.setInputAction(function (event) {
       if (Cesium.defined(floatingPoint)) {
@@ -124,7 +126,7 @@ export default function Home() {
     handler.setInputAction(function () {
       terminateShape();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-    
+
     const options = [
       {
         text: "Draw Lines",
@@ -134,7 +136,7 @@ export default function Home() {
               "This browser does not support polylines on terrain."
             );
           }
-    
+
           terminateShape();
           drawingMode = "line";
         },
@@ -149,9 +151,10 @@ export default function Home() {
     ];
 
 
-    // Zoom in to an area with mountains
+    // Zoom in to Purdue
+    const PURDUE_LOCATION = Cesium.Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0);
     viewer.camera.lookAt(
-      Cesium.Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0),
+      PURDUE_LOCATION,
       new Cesium.Cartesian3(0, -500, 1600)
     );
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
@@ -161,7 +164,37 @@ export default function Home() {
         url: Cesium.IonResource.fromAssetId(1608724),
       })
     );
-    
+
+
+    // Code to deal with adding Drones!
+    function createModel(url: string, height: number) {
+      viewer.entities.removeAll();
+
+      const position = PURDUE_LOCATION.clone();
+      position.z += height;
+      const heading = Cesium.Math.toRadians(135);
+      const pitch = 0;
+      const roll = 0;
+      const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+      const orientation = Cesium.Transforms.headingPitchRollQuaternion(
+        position,
+        hpr
+      );
+
+      const entity = viewer.entities.add({
+        name: url,
+        position: position,
+        orientation: orientation,
+        model: {
+          uri: url,
+        },
+      });
+    }
+
+    createModel(
+      "drone.glb",
+      10,
+    );
   })
 
   let altPressed = false
