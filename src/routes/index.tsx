@@ -2,6 +2,7 @@ import * as Cesium from 'cesium';
 import {createSignal, Index, onMount} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
+import {pickEntity} from "~/lib/cesium/pickEntity";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
@@ -73,6 +74,12 @@ export default function Home() {
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event) {
+      const pickedEntity = pickEntity(viewer, event.position)
+      if (pickedEntity && activeShapePoints.length == 0) {
+        // TODO: open ui popup
+        console.log("Picked", pickedEntity);
+        return;
+      }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
       // we get the correct point when mousing over terrain.
       const earthPosition = viewer.scene.pickPosition(event.position);
@@ -167,6 +174,7 @@ export default function Home() {
 
 
     // Code to deal with adding Drones!
+    // Adapted from https://sandcastle.cesium.com/?src=3D%20Models.html
     function createModel(url: string, height: number) {
       viewer.entities.removeAll();
 
@@ -187,6 +195,10 @@ export default function Home() {
         orientation: orientation,
         model: {
           uri: url,
+          // This config is responsible for keeping the drone at constant size while zooming out
+          // I think this is good b/c it makes finding/clicking drones easier
+          minimumPixelSize: 64,
+          maximumScale: 20000,
         },
       });
     }
