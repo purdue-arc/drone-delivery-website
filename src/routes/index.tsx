@@ -1,11 +1,16 @@
-import * as Cesium from "cesium";
-import { Index, createSignal, onMount } from "solid-js";
+import * as Cesium from 'cesium';
+import {CameraEventType, Cartesian2, Cartesian3, type Entity} from 'cesium';
+import {createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
-const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
+import {pickEntity} from "~/lib/cesium/pickEntity";
+import Tooltip from "~/components/Tooltip";
+import DroneTooltipContents from "~/components/DroneTooltipContents";
+const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
 export default function Home() {
   const [points, setPoints] = createSignal([] as string[]);
+  const [popupPos, setPopupPos] = createSignal<Cartesian2>();
 
   onMount(() => {
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
@@ -19,7 +24,26 @@ export default function Home() {
       shouldAnimate: true,
       homeButton: false,
       animation: true,
+      shouldAnimate: true,
     });
+
+    let selectedDrone: Entity | undefined;
+
+    // https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceCameraController.html
+    const cameraController = viewer.scene.screenSpaceCameraController;
+    // TODO: I tried changing controls, but it didn't seem to do anything
+    cameraController.translateEventTypes = CameraEventType.MIDDLE_DRAG;
+
+    viewer.camera.changed.addEventListener(() => {
+      if (!selectedDrone) return;
+      // https://cesium.com/learn/cesiumjs/ref-doc/SceneTransforms.html
+      setPopupPos(
+        Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
+      );
+    });
+    //viewer.camera.moveStart.addEventListener(console.log);
+    viewer.camera.percentageChanged = 0.001;
+
 
     if (!viewer.scene.pickPositionSupported) {
       window.alert("This browser does not support pickPosition.");
@@ -103,7 +127,7 @@ export default function Home() {
       },
     });
 
-    function createPoint(worldPosition: Cesium.Cartesian3) {
+    function createPoint(worldPosition: Cartesian3) {
       const point = viewer.entities.add({
         position: worldPosition,
         point: {
@@ -139,12 +163,26 @@ export default function Home() {
       return shape;
     }
 
-    let activeShapePoints = [] as Cesium.Cartesian3[];
+    let activeShapePoints = [] as Cartesian3[];
     let activeShape: Cesium.Entity | undefined;
     let floatingPoint: Cesium.Entity | undefined;
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event) {
+      const pickedEntity = pickEntity(viewer, event.position)
+      if (pickedEntity && activeShapePoints.length == 0) {  // Select drone only if no active path
+        console.log("Picked", pickedEntity);
+        selectedDrone = pickedEntity;
+        setPopupPos(
+          Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
+        );
+        return;
+      }
+      if (!pickedEntity && selectedDrone) {  // Unselect drone, don't start drawing path
+        selectedDrone = undefined;
+        setPopupPos(undefined);
+        return;
+      }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
       // we get the correct point when mousing over terrain.
       const earthPosition = viewer.scene.pickPosition(event.position);
@@ -219,10 +257,12 @@ export default function Home() {
       },
     ];
 
-    // Zoom in to an area with mountains
+
+    // Zoom in to Purdue
+    const PURDUE_LOCATION = Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0);
     viewer.camera.lookAt(
-      Cesium.Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0),
-      new Cesium.Cartesian3(0, -500, 1600)
+      PURDUE_LOCATION,
+      new Cartesian3(0, -500, 1600)
     );
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
 
@@ -230,6 +270,42 @@ export default function Home() {
       new Cesium.Cesium3DTileset({
         url: Cesium.IonResource.fromAssetId(1608724),
       })
+    );
+
+
+    // Code to deal with adding Drones!
+    // Adapted from https://sandcastle.cesium.com/?src=3D%20Models.html
+    function createModel(url: string, height: number) {
+      viewer.entities.removeAll();
+
+      const position = PURDUE_LOCATION.clone();
+      position.z += height;
+      const heading = Cesium.Math.toRadians(135);
+      const pitch = 0;
+      const roll = 0;
+      const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+      const orientation = Cesium.Transforms.headingPitchRollQuaternion(
+        position,
+        hpr
+      );
+
+      const entity = viewer.entities.add({
+        name: url,
+        position: position,
+        orientation: orientation,
+        model: {
+          uri: url,
+          // This config is responsible for keeping the drone at constant size while zooming out
+          // I think this is good b/c it makes finding/clicking drones easier
+          minimumPixelSize: 64,
+          maximumScale: 20000,
+        },
+      });
+    }
+
+    createModel(
+      "drone.glb",
+      10,
     );
   });
 
@@ -253,6 +329,11 @@ export default function Home() {
     <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <div id="drawingOptions"></div>
       <div id="cesiumContainer"></div>
+      <Show when={popupPos()?.x && popupPos()?.y}>
+        <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
+          <DroneTooltipContents />
+        </Tooltip>
+      </Show>
       <Index each={points()}>{(point, i) => <li>{point()}</li>}</Index>
     </main>
   );
