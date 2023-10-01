@@ -1,16 +1,18 @@
 import * as Cesium from 'cesium';
-import {CameraEventType, type Cartesian2, Cartesian3, type Entity} from 'cesium';
-import {createSignal, Index, onMount} from "solid-js";
+import {CameraEventType, Cartesian2, Cartesian3, type Entity} from 'cesium';
+import {createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import {pickEntity} from "~/lib/cesium/pickEntity";
+import Tooltip from "~/components/Tooltip";
+import DroneTooltipContents from "~/components/DroneTooltipContents";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
 export default function Home() {
 
-  const [points, setPoints] = createSignal([] as string[])
-  const [popupPos, setPopupPos] = createSignal<Cartesian2>()
+  const [points, setPoints] = createSignal([] as string[]);
+  const [popupPos, setPopupPos] = createSignal<Cartesian2>();
 
   onMount(() => {
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN
@@ -97,6 +99,9 @@ export default function Home() {
       if (pickedEntity && activeShapePoints.length == 0) {  // Select drone only if no active path
         console.log("Picked", pickedEntity);
         selectedDrone = pickedEntity;
+        setPopupPos(
+          Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
+        );
         return;
       }
       if (!pickedEntity && selectedDrone) {  // Unselect drone, don't start drawing path
@@ -253,10 +258,11 @@ export default function Home() {
     <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <div id="drawingOptions"></div>
       <div id="cesiumContainer"></div>
-      {popupPos() &&
-        <div style={{background: "white", position: "fixed", width: "20px", height: "20px", left: popupPos()!.x + "px", top: popupPos()!.y + "px"}}>
-        </div>
-      }
+      <Show when={popupPos()?.x && popupPos()?.y}>
+        <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
+          <DroneTooltipContents />
+        </Tooltip>
+      </Show>
       <Index each={points()}>{(point, i) =>
         <li>{point()}</li>}
       </Index>
