@@ -1,11 +1,12 @@
 import * as Cesium from 'cesium';
-import {CameraEventType, Cartesian2, Cartesian3, type Entity} from 'cesium';
+import {CameraEventType, Cartesian2, Cartesian3} from 'cesium';
 import {createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
-import {pickEntity} from "~/lib/cesium/pickEntity";
 import Tooltip from "~/components/Tooltip";
 import DroneTooltipContents from "~/components/DroneTooltipContents";
+import DronesController from "~/lib/cesium/DronesController";
+
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
 export default function Home() {
@@ -27,21 +28,12 @@ export default function Home() {
       shouldAnimate: true,
     });
 
-    let selectedDrone: Entity | undefined;
+    const dronesController = new DronesController(viewer, setPopupPos);
 
     // https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceCameraController.html
     const cameraController = viewer.scene.screenSpaceCameraController;
     // TODO: I tried changing controls, but it didn't seem to do anything
     cameraController.translateEventTypes = CameraEventType.MIDDLE_DRAG;
-
-    viewer.camera.changed.addEventListener(() => {
-      if (!selectedDrone) return;
-      // https://cesium.com/learn/cesiumjs/ref-doc/SceneTransforms.html
-      setPopupPos(
-        Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
-      );
-    });
-    //viewer.camera.moveStart.addEventListener(console.log);
     viewer.camera.percentageChanged = 0.001;
 
 
@@ -169,18 +161,7 @@ export default function Home() {
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event) {
-      const pickedEntity = pickEntity(viewer, event.position)
-      if (pickedEntity && activeShapePoints.length == 0) {  // Select drone only if no active path
-        console.log("Picked", pickedEntity);
-        selectedDrone = pickedEntity;
-        setPopupPos(
-          Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
-        );
-        return;
-      }
-      if (!pickedEntity && selectedDrone) {  // Unselect drone, don't start drawing path
-        selectedDrone = undefined;
-        setPopupPos(undefined);
+      if (dronesController.tryPickDrone(event.position, activeShapePoints.length > 0)) {
         return;
       }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
@@ -272,41 +253,7 @@ export default function Home() {
       })
     );
 
-
-    // Code to deal with adding Drones!
-    // Adapted from https://sandcastle.cesium.com/?src=3D%20Models.html
-    function createModel(url: string, height: number) {
-      viewer.entities.removeAll();
-
-      const position = PURDUE_LOCATION.clone();
-      position.z += height;
-      const heading = Cesium.Math.toRadians(135);
-      const pitch = 0;
-      const roll = 0;
-      const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-      const orientation = Cesium.Transforms.headingPitchRollQuaternion(
-        position,
-        hpr
-      );
-
-      const entity = viewer.entities.add({
-        name: url,
-        position: position,
-        orientation: orientation,
-        model: {
-          uri: url,
-          // This config is responsible for keeping the drone at constant size while zooming out
-          // I think this is good b/c it makes finding/clicking drones easier
-          minimumPixelSize: 64,
-          maximumScale: 20000,
-        },
-      });
-    }
-
-    createModel(
-      "drone.glb",
-      10,
-    );
+    dronesController.addDrone(PURDUE_LOCATION, 10);
   });
 
   let altPressed = false;
