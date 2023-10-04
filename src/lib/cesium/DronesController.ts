@@ -7,15 +7,27 @@ export default class DronesController {
   private selectedDrone: Entity | undefined;
 
   /**
+   * Takes the value of this.selectedDrone, converts its 3d position to 2d screen space,
+   * and uses that to update the popup position. If selectedDrone == undefined, sets popupPos to undefined also
+   * @private
+   */
+  private readonly updatePopupPos: () => void;
+
+  /**
    * Constructs a new Controller of all drones. Manages clicking on drones, tracking drone popups, and adding drones
    */
-  constructor(private viewer: Viewer, private setPopupPos: Setter<Cartesian2 | undefined>) {
+  constructor(private viewer: Viewer, _setPopupPos: Setter<Cartesian2 | undefined>) {
+    this.updatePopupPos = () =>
+      _setPopupPos(
+        this.selectedDrone ?
+        Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, this.selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
+        : undefined
+      );
+
     viewer.camera.changed.addEventListener(() => {
       if (!this.selectedDrone) return;
       // https://cesium.com/learn/cesiumjs/ref-doc/SceneTransforms.html
-      setPopupPos(
-        Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, this.selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
-      );
+      this.updatePopupPos();
     });
   }
 
@@ -28,14 +40,12 @@ export default class DronesController {
     if (pickedEntity && !pathActive) {  // Select drone only if no active path
       console.log("Picked", pickedEntity);
       this.selectedDrone = pickedEntity;
-      this.setPopupPos(
-        Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, this.selectedDrone.position!.getValue(this.viewer.scene.lastRenderTime) as Cartesian3)
-      );
+      this.updatePopupPos();
       return true;
     }
     if (!pickedEntity && this.selectedDrone) {  // Unselect drone, don't start drawing path
       this.selectedDrone = undefined;
-      this.setPopupPos(undefined);
+      this.updatePopupPos();
       return true;
     }
     return false;
