@@ -1,5 +1,5 @@
 import * as Cesium from 'cesium';
-import {CameraEventType, Cartesian2, Cartesian3} from 'cesium';
+import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from 'cesium';
 import {createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
@@ -160,7 +160,7 @@ export default function Home() {
     let floatingPoint: Cesium.Entity | undefined;
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-    handler.setInputAction(function (event) {
+    handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
       if (dronesController.tryPickDrone(event.position, activeShapePoints.length > 0)) {
         return;
       }
