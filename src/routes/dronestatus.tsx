@@ -3,7 +3,7 @@ import { HttpStatusCode } from "solid-start/server";
 
 import { Component, createSignal } from 'solid-js';
 import { MapPin, Compass, Battery, Speedometer } from 'solid-icons/fa';
-import LocationOnIcon from '@suid/icons-material/LocationOn';
+import LocationOnIcon from '@suid/icons-material/LocationOn'; 
 
 const DroneStatus: Component = () => {
   const [title, setTitle] = createSignal('Drone 1');
