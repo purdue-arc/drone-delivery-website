@@ -15,6 +15,8 @@ export default class DronesController {
 
   /**
    * Constructs a new Controller of all drones. Manages clicking on drones, tracking drone popups, and adding drones
+   * @param viewer a reference to the Cesium viewer
+   * @param _setPopupPos function to call when the camera moves with the drone's new screen position (used for sticky ui)
    */
   constructor(private viewer: Viewer, _setPopupPos: Setter<Cartesian2 | undefined>) {
     this.updatePopupPos = () =>
@@ -33,12 +35,13 @@ export default class DronesController {
 
   /**
    * Determines if click event is on top of drone and updates state accordingly
+   * @param clickPos the position the click event occurred at
+   * @param pathActive whether or not a flight path is currently being drawn. If it is, disallow selecting drones
    * @returns true if a drone was selected/unselected, false otherwise
    */
   tryPickDrone(clickPos: Cartesian2, pathActive: boolean): boolean {
     const pickedEntity = pickEntity(this.viewer, clickPos);
     if (pickedEntity && !pathActive) {  // Select drone only if no active path
-      console.log("Picked", pickedEntity);
       this.selectedDrone = pickedEntity;
       this.updatePopupPos();
       return true;
@@ -51,8 +54,11 @@ export default class DronesController {
     return false;
   }
 
-  // Code to deal with adding Drones!
-  // Adapted from https://sandcastle.cesium.com/?src=3D%20Models.html
+  /** Code to deal with adding Drones!
+   * @param location position in 3d world to add drone (except height)
+   * @param height distance off ground to place drone
+   * @see https://sandcastle.cesium.com/?src=3D%20Models.html
+   */
   addDrone(location: Cartesian3, height: number) {
     this.viewer.entities.removeAll();
 
