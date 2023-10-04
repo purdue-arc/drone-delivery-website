@@ -7,6 +7,7 @@ import {type Cartesian2, type Viewer} from "cesium";
  * Returns the top-most entity at the provided window coordinates
  * or undefined if no entity is at that location.
  *
+ * @param viewer a reference to the Cesium viewer
  * @param {Cartesian2} windowPosition The window coordinates.
  * @returns {Entity} The picked entity or undefined.
  */
