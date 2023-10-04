@@ -1,0 +1,31 @@
+/* Adapted from https://www.w3schools.com/css/css_tooltip.asp */
+/* Tooltip container */
+.tooltip {
+    position: fixed;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    background-color: white;
+    text-align: center;
+    border-radius: 6px; /* TODO: round buttons, then change this to 16 or smthn */
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -100px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    margin-bottom: 30px;
+}
+
+.tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -11px;
+    border-width: 11px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+}

@@ -1,35 +1,125 @@
 import * as Cesium from 'cesium';
-import { Index, createSignal, onMount } from "solid-js";
+import {CameraEventType, Cartesian2, Cartesian3} from 'cesium';
+import {createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
+import Tooltip from "~/components/Tooltip";
+import DroneTooltipContents from "~/components/DroneTooltipContents";
+import DronesController from "~/lib/cesium/DronesController";
+
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
 export default function Home() {
-
-  const [points, setPoints] = createSignal([] as string[])
+  const [points, setPoints] = createSignal([] as string[]);
+  const [popupPos, setPopupPos] = createSignal<Cartesian2>();
 
   onMount(() => {
-    Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN
+    Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
 
     const viewer = new Cesium.Viewer("cesiumContainer", {
       selectionIndicator: false,
       infoBox: false,
       terrainProvider: Cesium.createWorldTerrain(),
-      timeline: false,
+      timeline: true,
       sceneModePicker: false,
+      shouldAnimate: true,
       homeButton: false,
-      animation: false
+      animation: true,
+      shouldAnimate: true,
     });
-    
+
+    const dronesController = new DronesController(viewer, setPopupPos);
+
+    // https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceCameraController.html
+    const cameraController = viewer.scene.screenSpaceCameraController;
+    // TODO: I tried changing controls, but it didn't seem to do anything
+    cameraController.translateEventTypes = CameraEventType.MIDDLE_DRAG;
+    viewer.camera.percentageChanged = 0.001;
+
+
     if (!viewer.scene.pickPositionSupported) {
       window.alert("This browser does not support pickPosition.");
     }
-    
+
     viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
     );
+    // set simulation time
+    const start = Cesium.JulianDate.fromDate(new Date(2023, 9, 26, 16));
+    const stop = Cesium.JulianDate.addSeconds(
+      start,
+      360,
+      new Cesium.JulianDate()
+    );
+    viewer.clock.startTime = start.clone();
+    viewer.clock.stopTime = stop.clone();
+    viewer.clock.currentTime = start.clone();
+    viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP; //Loop at the end
+    viewer.clock.multiplier = 10;
+    viewer.timeline.zoomTo(start, stop);
+    function computeCirclularFlight(lon: number, lat: number, radius: number) {
+      const property = new Cesium.SampledPositionProperty();
+      for (let i = 0; i <= 360; i += 45) {
+        const radians = Cesium.Math.toRadians(i);
+        const time = Cesium.JulianDate.addSeconds(
+          start,
+          i,
+          new Cesium.JulianDate()
+        );
+        const position = Cesium.Cartesian3.fromDegrees(
+          lon + radius * 1.5 * Math.cos(radians),
+          lat + radius * Math.sin(radians),
+          Cesium.Math.nextRandomNumber() * 500 + 1750
+        );
+        property.addSample(time, position);
 
-    function createPoint(worldPosition: Cesium.Cartesian3) {
+        //Also create a point for each sample we generate.
+        viewer.entities.add({
+          position: position,
+          point: {
+            pixelSize: 8,
+            color: Cesium.Color.TRANSPARENT,
+            outlineColor: Cesium.Color.YELLOW,
+            outlineWidth: 3,
+          },
+        });
+      }
+      return property;
+    }
+    const position = computeCirclularFlight(-86.917814, 40.422814, 0.03);
+    const entity = viewer.entities.add({
+      //Set the entity availability to the same interval as the simulation time.
+      availability: new Cesium.TimeIntervalCollection([
+        new Cesium.TimeInterval({
+          start: start,
+          stop: stop,
+        }),
+      ]),
+
+      //Use our computed positions
+      position: position,
+
+      //Automatically compute orientation based on position movement.
+      orientation: new Cesium.VelocityOrientationProperty(position),
+
+      //Load the Cesium plane model to represent the entity
+      model: {
+        uri: "../../public/assets/TwoSidedPlane.gltf",
+        minimumPixelSize: 64,
+      },
+
+      //Show the path as a pink line sampled in 1 second increments.
+      path: {
+        resolution: 1,
+        material: new Cesium.PolylineGlowMaterialProperty({
+          glowPower: 0.1,
+          color: Cesium.Color.YELLOW,
+        }),
+        width: 10,
+      },
+    });
+
+    function createPoint(worldPosition: Cartesian3) {
       const point = viewer.entities.add({
         position: worldPosition,
         point: {
@@ -38,7 +128,7 @@ export default function Home() {
           heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
         },
       });
-      setPoints((points) => [...points, worldPosition.toString()])
+      setPoints((points) => [...points, worldPosition.toString()]);
       return point;
     }
     let drawingMode = "line";
@@ -65,12 +155,15 @@ export default function Home() {
       return shape;
     }
 
-    let activeShapePoints = [] as Cesium.Cartesian3[]
+    let activeShapePoints = [] as Cartesian3[];
     let activeShape: Cesium.Entity | undefined;
     let floatingPoint: Cesium.Entity | undefined;
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event) {
+      if (dronesController.tryPickDrone(event.position, activeShapePoints.length > 0)) {
+        return;
+      }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
       // we get the correct point when mousing over terrain.
       const earthPosition = viewer.scene.pickPosition(event.position);
@@ -79,7 +172,6 @@ export default function Home() {
         if (activeShapePoints.length === 0) {
           // Create the first floating point
           floatingPoint = createPoint(earthPosition);
-
 
           activeShapePoints.push(earthPosition);
           const dynamicPositions = new Cesium.CallbackProperty(function () {
@@ -94,7 +186,7 @@ export default function Home() {
         activeShapePoints.push(earthPosition);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    
+
     // Mouse move handler to change the position of the floating point
     handler.setInputAction(function (event) {
       if (Cesium.defined(floatingPoint)) {
@@ -124,17 +216,15 @@ export default function Home() {
     handler.setInputAction(function () {
       terminateShape();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-    
+
     const options = [
       {
         text: "Draw Lines",
         onselect: function () {
           if (!Cesium.Entity.supportsPolylinesOnTerrain(viewer.scene)) {
-            window.alert(
-              "This browser does not support polylines on terrain."
-            );
+            window.alert("This browser does not support polylines on terrain.");
           }
-    
+
           terminateShape();
           drawingMode = "line";
         },
@@ -149,10 +239,11 @@ export default function Home() {
     ];
 
 
-    // Zoom in to an area with mountains
+    // Zoom in to Purdue
+    const PURDUE_LOCATION = Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0);
     viewer.camera.lookAt(
-      Cesium.Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0),
-      new Cesium.Cartesian3(0, -500, 1600)
+      PURDUE_LOCATION,
+      new Cartesian3(0, -500, 1600)
     );
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
 
@@ -161,22 +252,23 @@ export default function Home() {
         url: Cesium.IonResource.fromAssetId(1608724),
       })
     );
-    
-  })
 
-  let altPressed = false
+    dronesController.addDrone(PURDUE_LOCATION, 10);
+  });
+
+  let altPressed = false;
 
   function handleKeyDown(event: KeyboardEvent) {
     // if alt key is pressed
     if (event.altKey) {
-      altPressed = true
+      altPressed = true;
     }
   }
 
   function handleKeyUp(event: KeyboardEvent) {
     // if alt key is pressed
     if (event.altKey) {
-      altPressed = false
+      altPressed = false;
     }
   }
 
@@ -184,9 +276,12 @@ export default function Home() {
     <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <div id="drawingOptions"></div>
       <div id="cesiumContainer"></div>
-      <Index each={points()}>{(point, i) =>
-        <li>{point()}</li>}
-      </Index>
+      <Show when={popupPos()?.x && popupPos()?.y}>
+        <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
+          <DroneTooltipContents />
+        </Tooltip>
+      </Show>
+      <Index each={points()}>{(point, i) => <li>{point()}</li>}</Index>
     </main>
   );
 }

@@ -1,5 +1,5 @@
 {
-  "name": "Solid",
+  "name": "Drone Delivery Website",
   "scripts": {
     "dev": "solid-start dev",
     "build": "solid-start build",
@@ -7,6 +7,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@suid/vite-plugin": "^0.1.5",
     "@types/node": "^18.11.18",
     "cesium": "^1.103.0",
     "esbuild": "^0.14.54",
@@ -20,6 +21,9 @@
     "@google/model-viewer": "^3.2.1",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
+    "@suid/icons-material": "^0.6.10",
+    "@suid/material": "^0.15.0",
+    "@supabase/supabase-js": "^2.36.0",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
     "maplibre-gl": "^2.4.0",
