@@ -17,11 +17,13 @@
     "vite-plugin-cesium": "^1.2.22"
   },
   "dependencies": {
+    "@google/model-viewer": "^3.2.1",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
     "maplibre-gl": "^2.4.0",
+    "react-leaflet": "^4.2.1",
     "solid-js": "^1.6.16",
     "solid-start": "^0.2.24",
     "undici": "^5.15.1"

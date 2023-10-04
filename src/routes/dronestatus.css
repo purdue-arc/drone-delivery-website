@@ -1,0 +1,27 @@
+    h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .map-container {
+        height: 200px;
+        width: 100%;
+    }
+
+    .model-viewer {
+        height: 400px;
+        width: 100%;
+    }
