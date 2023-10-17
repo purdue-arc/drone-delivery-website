@@ -18,6 +18,8 @@
     "vite-plugin-cesium": "^1.2.22"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.5",
+    "@merged/solid-apollo": "^1.7.1",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
     "@suid/icons-material": "^0.6.10",
@@ -25,6 +27,7 @@
     "@supabase/supabase-js": "^2.36.0",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
+    "graphql-ws": "^5.14.1",
     "maplibre-gl": "^2.4.0",
     "solid-js": "^1.6.16",
     "solid-start": "^0.2.24",
