@@ -4,6 +4,8 @@ import {Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Titl
 import "./root.css";
 import SideNav from "~/components/SideNav";
 import {Box, useTheme} from "@suid/material";
+import {ApolloProvider} from "@merged/solid-apollo";
+import gqlClient from "~/lib/gqlClient";
 
 export default function Root() {
   const theme = useTheme();
@@ -18,12 +20,14 @@ export default function Root() {
       <Body>
         <Suspense>
           <ErrorBoundary>
-            <SideNav />
-            <Box sx={{ paddingLeft: theme.spacing(7) }}> {/* TODO: This is JUST a few pixels off */}
-              <Routes>
-                <FileRoutes />
-              </Routes>
-            </Box>
+            <ApolloProvider client={gqlClient}>
+              <SideNav />
+              <Box sx={{ paddingLeft: theme.spacing(7) }}> {/* TODO: This is JUST a few pixels off */}
+                <Routes>
+                  <FileRoutes />
+                </Routes>
+              </Box>
+            </ApolloProvider>
           </ErrorBoundary>
         </Suspense>
         <Scripts />
