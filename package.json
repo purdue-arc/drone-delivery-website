@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.8.5",
+    "@merged/solid-apollo": "^1.7.1",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
     "@suid/icons-material": "^0.6.10",
