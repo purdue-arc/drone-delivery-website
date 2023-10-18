@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "solid-start dev",
     "build": "solid-start build",
-    "start": "solid-start start"
+    "start": "solid-start start",
+    "postinstall": "patch-package"
   },
   "type": "module",
   "devDependencies": {
@@ -11,6 +12,7 @@
     "@types/node": "^18.11.18",
     "cesium": "^1.103.0",
     "esbuild": "^0.14.54",
+    "patch-package": "^8.0.0",
     "postcss": "^8.4.21",
     "solid-start-node": "^0.2.19",
     "typescript": "^4.9.5",

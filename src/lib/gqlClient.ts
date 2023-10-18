@@ -1,8 +1,9 @@
-import {HttpLink, InMemoryCache, split} from '@apollo/client/core';
+import {HttpLink, InMemoryCache, split} from '@apollo/client/core/index.js';
 import {GraphQLWsLink} from "@apollo/client/link/subscriptions";
 import {createClient} from "graphql-ws";
 import {getMainDefinition} from '@apollo/client/utilities';
 import {ApolloClient} from '@merged/solid-apollo'
+import {isServer} from "solid-js/web";
 
 
 // Adapted from https://hasura.io/docs/latest/subscriptions/integrations/apollo-subscriptions/
@@ -19,7 +20,7 @@ const httpLink = new HttpLink({
   headers,
 });
 
-const wsLink = new GraphQLWsLink(createClient({
+const wsLink = isServer ? httpLink : new GraphQLWsLink(createClient({
   url: 'wss://' + HASURA_URL,
   connectionParams: {
     headers,
