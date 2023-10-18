@@ -1,3 +1,5 @@
+// Need /index.js here & patch for @merged/solid-apollo b/c https://github.com/apollographql/apollo-client/issues/8218
+// See also https://github.com/merged-js/solid-apollo/pull/9
 import {HttpLink, InMemoryCache, split} from '@apollo/client/core/index.js';
 import {GraphQLWsLink} from "@apollo/client/link/subscriptions";
 import {createClient} from "graphql-ws";
