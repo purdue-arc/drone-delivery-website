@@ -67,3 +67,4 @@ export default function DroneStatusCard(props: {droneId: number}) {
     </Card>
   );
 };
+
