@@ -4,11 +4,15 @@
     "dev": "solid-start dev",
     "build": "solid-start build",
     "start": "solid-start start",
+    "codegen": "graphql-codegen",
     "postinstall": "patch-package"
   },
   "type": "module",
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/client-preset": "^4.1.0",
     "@suid/vite-plugin": "^0.1.5",
+    "@types/graphql": "^14.5.0",
     "@types/node": "^18.11.18",
     "cesium": "^1.103.0",
     "esbuild": "^0.14.54",
@@ -29,6 +33,7 @@
     "@supabase/supabase-js": "^2.36.0",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
+    "graphql": "^16.8.1",
     "graphql-ws": "^5.14.1",
     "maplibre-gl": "^2.4.0",
     "solid-js": "^1.6.16",

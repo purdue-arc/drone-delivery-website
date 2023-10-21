@@ -12,20 +12,20 @@ import {isServer} from "solid-js/web";
 // Docs: https://www.apollographql.com/docs/react/data/subscriptions/
 // Solid adapter: https://github.com/merged-js/solid-apollo
 
-const HASURA_URL = "dd-hasura.purduearc.com/v1/graphql";
-const headers = {
+export const GRAPHQL_ENDPOINT = "dd-hasura.purduearc.com/v1/graphql";
+export const GRAPHQL_HEADERS = {
   "x-hasura-admin-secret": import.meta.env["VITE_HASURA_ADMIN_SECRET"],
 };
 
 const httpLink = new HttpLink({
-  uri: 'https://' + HASURA_URL,
-  headers,
+  uri: 'https://' + GRAPHQL_ENDPOINT,
+  headers: GRAPHQL_HEADERS,
 });
 
 const wsLink = isServer ? httpLink : new GraphQLWsLink(createClient({
-  url: 'wss://' + HASURA_URL,
+  url: 'wss://' + GRAPHQL_ENDPOINT,
   connectionParams: {
-    headers,
+    headers: GRAPHQL_HEADERS,
   }
 }));
 
