@@ -1,0 +1,30 @@
+diff --git a/node_modules/@merged/solid-apollo/dist/es/createLazyQuery.js b/node_modules/@merged/solid-apollo/dist/es/createLazyQuery.js
+index 3434b51..055f573 100644
+--- a/node_modules/@merged/solid-apollo/dist/es/createLazyQuery.js
++++ b/node_modules/@merged/solid-apollo/dist/es/createLazyQuery.js
+@@ -1,4 +1,4 @@
+-import { mergeOptions } from '@apollo/client/core';
++import { mergeOptions } from '@apollo/client/core/index.js';
+ import { createSignal, createResource, onCleanup, untrack } from 'solid-js';
+ import { createStore, reconcile } from 'solid-js/store';
+ import { useApollo } from './ApolloProvider.js';
+diff --git a/node_modules/@merged/solid-apollo/dist/es/createMutation.js b/node_modules/@merged/solid-apollo/dist/es/createMutation.js
+index 243e40e..ef9c41c 100644
+--- a/node_modules/@merged/solid-apollo/dist/es/createMutation.js
++++ b/node_modules/@merged/solid-apollo/dist/es/createMutation.js
+@@ -1,4 +1,4 @@
+-import { mergeOptions } from '@apollo/client/core';
++import { mergeOptions } from '@apollo/client/core/index.js';
+ import { createSignal, createResource, untrack } from 'solid-js';
+ import { useApollo } from './ApolloProvider.js';
+ 
+diff --git a/node_modules/@merged/solid-apollo/dist/es/index.js b/node_modules/@merged/solid-apollo/dist/es/index.js
+index f2203d8..89e39ac 100644
+--- a/node_modules/@merged/solid-apollo/dist/es/index.js
++++ b/node_modules/@merged/solid-apollo/dist/es/index.js
+@@ -3,4 +3,4 @@ export { createQuery } from './createQuery.js';
+ export { createMutation } from './createMutation.js';
+ export { createSubscription } from './createSubscription.js';
+ export { createLazyQuery } from './createLazyQuery.js';
+-export { ApolloClient, InMemoryCache, gql } from '@apollo/client/core';
++export { ApolloClient, InMemoryCache, gql } from '@apollo/client/core/index.js';

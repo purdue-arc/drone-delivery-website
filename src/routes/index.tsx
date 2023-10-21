@@ -1,5 +1,5 @@
 import * as Cesium from 'cesium';
-import {CameraEventType, Cartesian2, Cartesian3} from 'cesium';
+import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from 'cesium';
 import {createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
@@ -20,14 +20,14 @@ export default function Home() {
       selectionIndicator: false,
       infoBox: false,
       terrainProvider: Cesium.createWorldTerrain(),
-      timeline: true,
       sceneModePicker: false,
+      timeline: true,
       shouldAnimate: true,
       homeButton: false,
       animation: true,
-      shouldAnimate: true,
+      
     });
-
+  
     const dronesController = new DronesController(viewer, setPopupPos);
 
     // https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceCameraController.html
@@ -45,10 +45,10 @@ export default function Home() {
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
     );
     // set simulation time
-    const start = Cesium.JulianDate.fromDate(new Date(2023, 9, 26, 16));
+    const start = Cesium.JulianDate.fromDate(new Date(2023, 9, 14, 6));
     const stop = Cesium.JulianDate.addSeconds(
       start,
-      360,
+      3600,
       new Cesium.JulianDate()
     );
     viewer.clock.startTime = start.clone();
@@ -58,12 +58,13 @@ export default function Home() {
     viewer.clock.multiplier = 10;
     viewer.timeline.zoomTo(start, stop);
     function computeCirclularFlight(lon: number, lat: number, radius: number) {
+      
       const property = new Cesium.SampledPositionProperty();
       for (let i = 0; i <= 360; i += 45) {
         const radians = Cesium.Math.toRadians(i);
         const time = Cesium.JulianDate.addSeconds(
           start,
-          i,
+          i ,
           new Cesium.JulianDate()
         );
         const position = Cesium.Cartesian3.fromDegrees(
@@ -77,47 +78,60 @@ export default function Home() {
         viewer.entities.add({
           position: position,
           point: {
-            pixelSize: 8,
-            color: Cesium.Color.TRANSPARENT,
-            outlineColor: Cesium.Color.YELLOW,
+            pixelSize: 18,
+            color: Cesium.Color.RED,
+            outlineColor: Cesium.Color.RED,
             outlineWidth: 3,
           },
         });
       }
       return property;
     }
-    const position = computeCirclularFlight(-86.917814, 40.422814, 0.03);
-    const entity = viewer.entities.add({
-      //Set the entity availability to the same interval as the simulation time.
-      availability: new Cesium.TimeIntervalCollection([
-        new Cesium.TimeInterval({
-          start: start,
-          stop: stop,
-        }),
-      ]),
+    function computeLineFlight(startLon: number, startLat: number, endLon: number, endLat: number) {
+      const property = new Cesium.SampledPositionProperty();
+      const time = Cesium.JulianDate.addSeconds(
+        start,
+        0 ,
+        new Cesium.JulianDate()
+      );
+      const startPosition = Cesium.Cartesian3.fromDegrees(startLon, startLat, 1750);
+      const endPosition = Cesium.Cartesian3.fromDegrees(endLon, endLat, 1750);
+      property.addSample(time, startPosition);
+      property.addSample(stop, endPosition);
+      return property;
+    }
+    // const position = computeCirclularFlight(-86.917814, 40.422814, 0.03);
+    // const entity1 = viewer.entities.add({
+    //   //Set the entity availability to the same interval as the simulation time.
+    //   availability: new Cesium.TimeIntervalCollection([
+    //     new Cesium.TimeInterval({
+    //       start: start,
+    //       stop: stop,
+    //     }),
+    //   ]),
 
-      //Use our computed positions
-      position: position,
+    //   //Use our computed positions
+    //   position: position,
 
-      //Automatically compute orientation based on position movement.
-      orientation: new Cesium.VelocityOrientationProperty(position),
+    //   //Automatically compute orientation based on position movement.
+    //   orientation: new Cesium.VelocityOrientationProperty(position),
 
-      //Load the Cesium plane model to represent the entity
-      model: {
-        uri: "../../public/assets/TwoSidedPlane.gltf",
-        minimumPixelSize: 64,
-      },
+    //   //Load the Cesium plane model to represent the entity
+    //   model: {
+    //     uri: "../../public/assets/TwoSidedPlane.gltf",
+    //     minimumPixelSize: 64,
+    //   },
 
-      //Show the path as a pink line sampled in 1 second increments.
-      path: {
-        resolution: 1,
-        material: new Cesium.PolylineGlowMaterialProperty({
-          glowPower: 0.1,
-          color: Cesium.Color.YELLOW,
-        }),
-        width: 10,
-      },
-    });
+    //   //Show the path as a pink line sampled in 1 second increments.
+    //   path: {
+    //     resolution: 1,
+    //     material: new Cesium.PolylineGlowMaterialProperty({
+    //       glowPower: 0.1,
+    //       color: Cesium.Color.YELLOW,
+    //     }),
+    //     width: 10,
+    //   },
+    // });
 
     function createPoint(worldPosition: Cartesian3) {
       const point = viewer.entities.add({
@@ -160,7 +174,7 @@ export default function Home() {
     let floatingPoint: Cesium.Entity | undefined;
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-    handler.setInputAction(function (event) {
+    handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
       if (dronesController.tryPickDrone(event.position, activeShapePoints.length > 0)) {
         return;
       }
@@ -183,6 +197,7 @@ export default function Home() {
           activeShape = drawShape(dynamicPositions);
         }
         createPoint(earthPosition);
+        
         activeShapePoints.push(earthPosition);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -213,8 +228,48 @@ export default function Home() {
     }
 
     // End the shape
-    handler.setInputAction(function () {
-      terminateShape();
+    handler.setInputAction(function () {      
+      
+      let pos = Cesium.Cartographic.fromCartesian(activeShapePoints[0]);
+      let pos1 = [pos.longitude / Math.PI * 180, pos.latitude / Math.PI * 180];
+      let pos2 = Cesium.Cartographic.fromCartesian(activeShapePoints[1]);
+      let pos3 = [pos2.longitude / Math.PI * 180, pos2.latitude / Math.PI * 180];
+      const position = computeLineFlight(pos1[0], pos1[0], pos3[0],pos3[1]);
+      const entity1 = viewer.entities.add({
+        //Set the entity availability to the same interval as the simulation time.
+        availability: new Cesium.TimeIntervalCollection([
+          new Cesium.TimeInterval({
+            start: start,
+            stop: stop,
+          }),
+        ]),
+        // convert x and y to lon and lat
+       
+
+        //Use our computed positions
+        position: Cesium.Cartesian3.fromDegrees(pos1[0], pos1[1], 1750),
+  
+        //Automatically compute orientation based on position movement.
+        orientation: new Cesium.VelocityOrientationProperty(position),
+  
+        //Load the Cesium plane model to represent the entity
+        model: {
+          uri: "../../public/assets/TwoSidedPlane.gltf",
+          minimumPixelSize: 64,
+        },
+  
+        //Show the path as a pink line sampled in 1 second increments.
+        path: {
+          resolution: 1,
+          material: new Cesium.PolylineGlowMaterialProperty({
+            glowPower: 0.1,
+            color: Cesium.Color.YELLOW,
+          }),
+          width: 10,
+        },
+      });
+      // viewer.flyTo(entity1);
+      // terminateShape();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     const options = [
@@ -253,7 +308,7 @@ export default function Home() {
       })
     );
 
-    dronesController.addDrone(PURDUE_LOCATION, 10);
+    // dronesController.addDrone(PURDUE_LOCATION, 10);
   });
 
   let altPressed = false;
