@@ -13,19 +13,19 @@ import {isServer} from "solid-js/web";
 // Solid adapter: https://github.com/merged-js/solid-apollo
 
 export const GRAPHQL_ENDPOINT = "dd-hasura.purduearc.com/v1/graphql";
-export const GRAPHQL_HEADERS = {
+const headers = {
   "x-hasura-admin-secret": import.meta.env["VITE_HASURA_ADMIN_SECRET"] as string,
 };
 
 const httpLink = new HttpLink({
   uri: 'https://' + GRAPHQL_ENDPOINT,
-  headers: GRAPHQL_HEADERS,
+  headers,
 });
 
 const wsLink = isServer ? httpLink : new GraphQLWsLink(createClient({
   url: 'wss://' + GRAPHQL_ENDPOINT,
   connectionParams: {
-    headers: GRAPHQL_HEADERS,
+    headers,
   }
 }));
 
