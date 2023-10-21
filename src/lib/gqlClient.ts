@@ -6,6 +6,7 @@ import {createClient} from "graphql-ws";
 import {getMainDefinition} from '@apollo/client/utilities';
 import {ApolloClient} from '@merged/solid-apollo'
 import {isServer} from "solid-js/web";
+import { loadEnv } from 'vite';
 
 
 // Adapted from https://hasura.io/docs/latest/subscriptions/integrations/apollo-subscriptions/
@@ -14,7 +15,10 @@ import {isServer} from "solid-js/web";
 
 export const GRAPHQL_ENDPOINT = "dd-hasura.purduearc.com/v1/graphql";
 export const GRAPHQL_HEADERS = {
-  "x-hasura-admin-secret": import.meta.env["VITE_HASURA_ADMIN_SECRET"],
+  "x-hasura-admin-secret": (
+    import.meta.env["VITE_HASURA_ADMIN_SECRET"]
+    ?? loadEnv("production", process.cwd())["VITE_HASURA_ADMIN_SECRET"]
+  ) as string,
 };
 
 const httpLink = new HttpLink({
