@@ -1,15 +1,15 @@
-import {gql} from '@apollo/client/core';
 import {createSubscription} from '@merged/solid-apollo'
+import {graphql} from "~/gql";
 
 
-const SUBSCRIPTION = gql`
+const SUBSCRIPTION = graphql(`
   subscription GetCountriesStreamingSubscription {
     countries {
       id
       name
     }
   }
-`;
+`);
 
 export default function Gql() {
   const data = createSubscription(SUBSCRIPTION);
