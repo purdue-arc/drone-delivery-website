@@ -25,6 +25,7 @@ export default function Drones() {
     <Box padding={2}>
       <Typography variant="h3">All Drones</Typography>
       {/*TODO: no clue where borderColor came from*/}
+      {/* Adapted from: https://mui.com/material-ui/react-table/#basic-table */}
       <TableContainer sx={{borderRadius: 2, border: 1, borderColor: "rgba(224.4, 224.4, 224.4, 1)"}} component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>

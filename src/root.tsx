@@ -22,7 +22,8 @@ export default function Root() {
           <ErrorBoundary>
             <ApolloProvider client={gqlClient}>
               <SideNav />
-              <Box sx={{ paddingLeft: theme.spacing(7) }}> {/* TODO: This is JUST a few pixels off */}
+              {/* TODO: This is JUST a few pixels off. https://mui.com/material-ui/customization/breakpoints/ might help? */}
+              <Box sx={{ paddingLeft: theme.spacing(7) }}>
                 <Routes>
                   <FileRoutes />
                 </Routes>
