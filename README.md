@@ -53,3 +53,17 @@ and then fill in the access token variable (no quotes surrounding the token).
 Solid apps are built with _adapters_, which optimise your project for deployment to different environments.
 
 By default, `npm run build` will generate a Node app that you can run with `npm start`. To use a different adapter, add it to the `devDependencies` in `package.json` and specify in your `vite.config.js`.
+
+## Tech Stack Resources
+1. [Solid.js](https://www.solidjs.com/tutorial/): Reactive ui library
+2. Solid Start (Web framework using solid.js)
+3. [Material UI](https://mui.com/material-ui/react-autocomplete/): design framework by google & component library (but for React)
+    - [SolidJS User Interface Design (SUID)](https://suid.io/): A port of Material-UI (MUI) built with SolidJS. Identical to Material UI, reference above docs
+    - [Material icons](https://mui.com/material-ui/material-icons/)
+    - [Styling](https://mui.com/system/properties/) & [sx prop](https://mui.com/system/getting-started/the-sx-prop/)
+4. [Cesium](https://sandcastle.cesium.com/): 3D map rendering engine
+5. Supabase
+   - Postgres
+6. Hasura 
+   - GraphQL
+7. Vite: Build tool
