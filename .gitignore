@@ -6,6 +6,9 @@ dist
 .netlify
 netlify
 
+# Generated Files
+/src/gql
+
 # dependencies
 /node_modules
 
