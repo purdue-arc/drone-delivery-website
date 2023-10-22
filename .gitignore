@@ -8,6 +8,7 @@ netlify
 
 # Generated Files
 /src/gql
+vite.config.ts.timestamp*
 
 # dependencies
 /node_modules
@@ -25,5 +26,6 @@ gitignore
 # System Files
 .DS_Store
 Thumbs.db
+*.icloud
 
 *.local
