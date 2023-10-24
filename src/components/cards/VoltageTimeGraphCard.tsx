@@ -1,12 +1,13 @@
-import { createSignal } from 'solid-js'
-import { Line } from 'solid-chartjs'
+import {createSignal} from 'solid-js'
+import {Line} from 'solid-chartjs'
+import {Card} from "@suid/material";
 
 export default function BatteryReleaseChartCard(props: {droneId: number}) {
     const [data] = createSignal({
         labels: Array.from({length: 10}, (_,i) => i + 1), //times in seconds
         datasets: [
             {
-                label: 'Battery Voltage', 
+                label: 'Battery Voltage',
                 data: Array.from({length: 10}, () => Math.random() * 10), //Random voltage values
                 fill: false,
                 borderColor: 'rgb(75, 192, 192)',
@@ -15,27 +16,27 @@ export default function BatteryReleaseChartCard(props: {droneId: number}) {
         ]
     })
     return (
-        <div>
+        <Card variant="outlined">
             <Line data={data()} options = {{
                 type: 'line',
-                responsive: true, 
+                responsive: true,
                 scales: {
                     x: {
                         title: {
-                            display: true, 
+                            display: true,
                             text: 'Time (seconds)'
                         }
                     },
                     y: {
                         title: {
-                            display: true, 
+                            display: true,
                             text: 'Voltage (V)'
                         }
                     }
                 }
             }} />
-        </div>
-    )    
+        </Card>
+    )
 }
 
 
@@ -50,7 +51,7 @@ export default function BatteryReleaseChartCard(props: {droneId: number}) {
 //         onMount(() => {
 //             Chart.register(Title, Tooltip, Legend, Colors)
 //         })
-    
+
 //         const chartData = {
 //             labels: ['January', 'February', 'March', 'April', 'May'],
 //             datasets: [
@@ -64,12 +65,11 @@ export default function BatteryReleaseChartCard(props: {droneId: number}) {
 //             responsive: true,
 //             maintainAspectRatio: false,
 //         }
-    
+
 //         return (
 //             <div>
 //                 <Line data={chartData} options={chartOptions} width={500} height={500} />
 //             </div>
 //         )
-        
+
 // }
-    
