@@ -11,9 +11,9 @@ services:
     #   context: .
     #   dockerfile: .devcontainer/Dockerfile
 
-    image: node:latest
+    image: node:18
     command: >
-      sh -c "npm install && npm run dev && while sleep 1000; do :; done"
+      sh -c "while sleep 1000; do :; done"
     working_dir: /workspace
     ports:
       - "8080:8080"
