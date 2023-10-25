@@ -13,6 +13,7 @@ const SUBSCRIPTION = graphql(`
 
 export default function Gql() {
   const data = createSubscription(SUBSCRIPTION);
+  // Note: if you try to console.log data() here, will only print undefined, but it's working
 
   return (
     <div style={{"padding-left": "12px"}}>{JSON.stringify(data(), null, 2)}</div>
