@@ -1,4 +1,3 @@
-import {createSignal} from 'solid-js';
 import {
   Battery0Bar,
   Battery1Bar,
@@ -15,17 +14,32 @@ import {
 import {Dynamic} from "solid-js/web";
 import {Box, Button, Card, Grid, Stack, Typography} from "@suid/material";
 import {useParams} from "@solidjs/router";
+import {graphql} from "~/gql";
+import {createSubscription} from "@merged/solid-apollo";
+import {Show} from "solid-js";
 
 const batteryStatus = [Battery0Bar, Battery1Bar, Battery2Bar, Battery3Bar, Battery4Bar, Battery5Bar, Battery6Bar, BatteryFull];
 
-export default function DroneStatusCard(props: {droneId: number}) {
+const statusQuery = graphql(`
+  subscription DroneInfo($droneId: bigint!) {
+      now: drone_telemetry_by_pk(id: $droneId) {
+          velocity
+          latitude
+          longitude
+          heading
+          timestamp
+          battery
+          altitude
+      }
+  }
+`)
+
+const LoadingElem = () => <span>loading...</span>;
+
+
+export default function DroneStatusCard() {
   const params = useParams();
-  const [location, setLocation] = createSignal('40.425651, -86.918249');
-  const [direction, setDirection] = createSignal('30 degree North');
-  /** miles per hour */
-  const [speed, setSpeed] = createSignal(20);
-  /** Integer ranging from 0-100 */
-  const [battery, setBattery] = createSignal(0.9);
+  const droneInfo = createSubscription(statusQuery);
 
   return (
     <Card variant="outlined" sx={{display: "inline-block", padding: 2}}>
@@ -36,19 +50,39 @@ export default function DroneStatusCard(props: {droneId: number}) {
           </Box>
           <p>
             <PlaceIcon sx={{ marginRight: '0.5em' }} />
-            {location()}
+            <Show
+              when={droneInfo()}
+              fallback={LoadingElem()}
+            >
+              ({droneInfo().now.latitude}, {droneInfo().now.longitude})
+            </Show>
           </p>
           <p>
             <CompassIcon sx={{ marginRight: '0.5em' }} />
-            {direction()}
+            <Show
+              when={droneInfo()}
+              fallback={LoadingElem()}
+            >
+              {droneInfo().now.heading}
+            </Show>
           </p>
           <p>
             <SpeedIcon sx={{ marginRight: '0.5em' }} />
-            {speed()} mph
+            <Show
+              when={droneInfo()}
+              fallback={LoadingElem()}
+            >
+              {droneInfo().now.velocity} mph
+            </Show>
           </p>
           <p>
-            <Dynamic component={batteryStatus[Math.round(battery() * (batteryStatus.length - 1))]} sx={{ marginRight: '0.5em' }} />
-            {battery() * 100}%
+            <Dynamic component={batteryStatus[Math.round(droneInfo().now.battery() / 100 * (batteryStatus.length - 1))]} sx={{ marginRight: '0.5em' }} />
+            <Show
+              when={droneInfo()}
+              fallback={LoadingElem()}
+            >
+              {droneInfo().now.battery}%
+            </Show>
           </p>
         </Grid>
         <Grid item container direction="column" width={500}>
