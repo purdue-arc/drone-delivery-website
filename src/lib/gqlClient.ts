@@ -33,6 +33,14 @@ const splitLink = split(
   ({ query }) =>
   {
     const definition = getMainDefinition(query);
+    // Needed b/c prerendering doesn't work without websocket implementation, browser doesn't support nodejs implementation,
+    // Client & server code must be the same (I think)
+    // Plus, subscription doesn't make sense for something that happens once
+    // SSR: false not desirable b/c doesn't warn about some errors (renderToString timed out)
+    // TODO: I believe this was working with Apollo's gql`` string, what's the difference?
+    if (isServer && definition.kind === 'OperationDefinition')
+      // @ts-ignore
+      definition.operation = "query";
     return (
       definition.kind === 'OperationDefinition' &&
       definition.operation === 'subscription'
