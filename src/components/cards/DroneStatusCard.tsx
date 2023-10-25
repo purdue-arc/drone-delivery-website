@@ -14,11 +14,12 @@ import {
 } from '@suid/icons-material';
 import {Dynamic} from "solid-js/web";
 import {Box, Button, Card, Grid, Stack, Typography} from "@suid/material";
+import {useParams} from "@solidjs/router";
 
 const batteryStatus = [Battery0Bar, Battery1Bar, Battery2Bar, Battery3Bar, Battery4Bar, Battery5Bar, Battery6Bar, BatteryFull];
 
 export default function DroneStatusCard(props: {droneId: number}) {
-  const [title, setTitle] = createSignal('Drone 1');
+  const params = useParams();
   const [location, setLocation] = createSignal('40.425651, -86.918249');
   const [direction, setDirection] = createSignal('30 degree North');
   /** miles per hour */
@@ -31,7 +32,7 @@ export default function DroneStatusCard(props: {droneId: number}) {
       <Grid container spacing={2}>
         <Grid item>
           <Box sx={{textAlign: "center"}}>
-            <img src="drone.jpg" width="150px" />
+            <img src="/drone.jpg" width="150px" />
           </Box>
           <p>
             <PlaceIcon sx={{ marginRight: '0.5em' }} />
@@ -52,7 +53,7 @@ export default function DroneStatusCard(props: {droneId: number}) {
         </Grid>
         <Grid item container direction="column" width={500}>
           <Grid item sx={{flexGrow: 99}}>
-            <Typography sx={{ fontSize: '2em', fontWeight: 'bold', textAlign: "center" }}>{title()}</Typography>
+            <Typography sx={{ fontSize: '2em', fontWeight: 'bold', textAlign: "center" }}>Drone {params.id}</Typography>
             <Typography>✅ Operational / ⚠️ Low battery / 🚨 Crashed</Typography>
             <Typography>Delivering to ___/picking up from _____/parking at/idle</Typography>
           </Grid>

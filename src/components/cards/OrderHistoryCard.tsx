@@ -2,11 +2,12 @@ import {Card, Table, TableCell, TableContainer, TableHead, TableRow} from "@suid
 import {graphql} from "~/gql";
 import {For} from "solid-js";
 import {createSubscription} from "@merged/solid-apollo";
+import {useParams} from "@solidjs/router";
 
 
 const orderQuery = graphql(`
-    subscription GetDroneOrdersSubscription {
-        orders(where: {flights: {drone_id: {_eq: "1"}}}) {
+    subscription GetDroneOrdersSubscription($droneId: bigint!) {
+        orders(where: {flights: {drone_id: {_eq: $droneId}}}) {
             vendor {
                 name
             }
@@ -19,7 +20,8 @@ const orderQuery = graphql(`
 
 
 export default function OrderHistoryCard() {
-  const orders = createSubscription(orderQuery);
+  const params = useParams();
+  const orders = createSubscription(orderQuery, {variables: {droneId: params.id}});
 
   return (
     <Card variant="outlined">
