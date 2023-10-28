@@ -6,6 +6,7 @@ import {createClient} from "graphql-ws";
 import {getMainDefinition} from '@apollo/client/utilities';
 import {ApolloClient} from '@merged/solid-apollo'
 import {isServer} from "solid-js/web";
+import ws from 'ws';
 
 
 // Adapted from https://hasura.io/docs/latest/subscriptions/integrations/apollo-subscriptions/
@@ -22,25 +23,21 @@ const httpLink = new HttpLink({
   headers,
 });
 
-const wsLink = isServer ? httpLink : new GraphQLWsLink(createClient({
+const wsLink = new GraphQLWsLink(createClient({
   url: 'wss://' + GRAPHQL_ENDPOINT,
   connectionParams: {
     headers,
-  }
+  },
+  // It doesn't really make sense to open a websocket connection for something that just fetches once,
+  // But the alternative is dynamically rewriting gql requests (subscription -> query)
+  // See https://stackoverflow.com/questions/61743153
+  webSocketImpl: isServer ? ws : undefined,
 }));
 
 const splitLink = split(
   ({ query }) =>
   {
     const definition = getMainDefinition(query);
-    // Needed b/c prerendering doesn't work without websocket implementation, browser doesn't support nodejs implementation,
-    // Client & server code must be the same (I think)
-    // Plus, subscription doesn't make sense for something that happens once
-    // SSR: false not desirable b/c doesn't warn about some errors (renderToString timed out)
-    // TODO: I believe this was working with Apollo's gql`` string, what's the difference?
-    if (isServer && definition.kind === 'OperationDefinition')
-      // @ts-ignore
-      definition.operation = "query";
     return (
       definition.kind === 'OperationDefinition' &&
       definition.operation === 'subscription'

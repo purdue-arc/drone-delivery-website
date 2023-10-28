@@ -56,6 +56,7 @@ By default, `npm run build` will generate a Node app that you can run with `npm 
 
 ## Tech Stack Resources
 1. [Solid.js](https://www.solidjs.com/tutorial/): Reactive ui library
+    - [Testing](https://docs.solidjs.com/guides/how-to-guides/testing-in-solid/vitest) or maybe cypress
 2. Solid Start (Web framework using solid.js)
 3. [Material UI](https://mui.com/material-ui/react-autocomplete/): design framework by google & component library (but for React)
     - [SolidJS User Interface Design (SUID)](https://suid.io/): A port of Material-UI (MUI) built with SolidJS. Identical to Material UI, reference above docs
