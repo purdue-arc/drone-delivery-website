@@ -54,35 +54,38 @@ export default class DronesController {
     return false;
   }
 
+  /** TODO: document */
+  setDronePos(entity: Entity, longitude: number, latitude: number, height: number, heading: number) {
+    const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, height);
+    const hpr = new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(heading), 0, 0);
+    const orientation = Cesium.Transforms.headingPitchRollQuaternion(
+      position,
+      hpr
+    );
+    entity.position = position;
+    entity.orientation = orientation;
+    return entity;
+  }
+
   /** Code to deal with adding Drones!
    * @param location position in 3d world to add drone (except height)
    * @param height distance off ground to place drone
    * @see https://sandcastle.cesium.com/?src=3D%20Models.html
    */
-  addDrone(location: Cartesian3, height: number) {
-    const position = location.clone();
-    position.z += height;
-    const heading = Cesium.Math.toRadians(135);
-    const pitch = 0;
-    const roll = 0;
-    const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
-    const orientation = Cesium.Transforms.headingPitchRollQuaternion(
-      position,
-      hpr
-    );
-
+  addDrone(longitude: number, latitude: number, height: number, heading: number) {
     const url = "drone.glb";
-    const entity = this.viewer.entities.add({
-      //name: url,  // I don't think this is actually important, but keeping just in case
-      position: position,
-      orientation: orientation,
-      model: {
-        uri: url,
-        // This config is responsible for keeping the drone at constant size while zooming out
-        // I think this is good b/c it makes finding/clicking drones easier
-        minimumPixelSize: 64,
-        maximumScale: 20000,
-      },
-    });
+    return this.setDronePos(
+      this.viewer.entities.add({
+        //name: url,  // I don't think this is actually important, but keeping just in case
+        model: {
+          uri: url,
+          // This config is responsible for keeping the drone at constant size while zooming out
+          // I think this is good b/c it makes finding/clicking drones easier
+          minimumPixelSize: 64,
+          maximumScale: 20000,
+        },
+      }),
+      longitude, latitude, height, heading
+    );
   }
 }

@@ -1,17 +1,34 @@
 import * as Cesium from 'cesium';
-import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from 'cesium';
-import {createSignal, Index, onMount, Show} from "solid-js";
+import {CameraEventType, Cartesian2, Cartesian3, type Entity, type ScreenSpaceEventHandler} from 'cesium';
+import {createEffect, createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import Tooltip from "~/components/Tooltip";
 import DroneTooltipContents from "~/components/DroneTooltipContents";
 import DronesController from "~/lib/cesium/DronesController";
+import {graphql} from "~/gql";
+import {createSubscription} from "@merged/solid-apollo";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
 
+const dronesPosQuery = graphql(`
+    subscription DronesPos {
+        drone_telemetry(distinct_on: drone_id, order_by: {timestamp: desc, drone_id: asc}) {
+            id: drone_id
+            heading
+            latitude
+            longitude
+            altitude
+        }
+    }
+`)
+
 export default function Home() {
+  // TODO: can all of these signals be moved inside onMount? is there React-like restriction?
   const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
+  const dronesPos = createSubscription(dronesPosQuery);
+  const drones: Record<number, Entity> = {};
 
   onMount(() => {
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
@@ -29,6 +46,17 @@ export default function Home() {
     });
 
     const dronesController = new DronesController(viewer, setPopupPos);
+
+    createEffect(() => {
+      console.log(dronesPos());
+      for (const drone of dronesPos()?.drone_telemetry ?? []) {
+        if (drone.id in drones) {
+          dronesController.setDronePos(drones[drone.id], drone.longitude, drone.latitude, drone.altitude, drone.heading);
+        } else {
+          drones[drone.id] = dronesController.addDrone(drone.longitude, drone.latitude, drone.altitude, drone.heading);
+        }
+      }
+    });
 
     // https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceCameraController.html
     const cameraController = viewer.scene.screenSpaceCameraController;
@@ -281,8 +309,6 @@ export default function Home() {
         url: Cesium.IonResource.fromAssetId(1608724),
       })
     );
-
-    dronesController.addDrone(PURDUE_LOCATION, 10);
   });
 
   let altPressed = false;
