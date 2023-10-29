@@ -1,6 +1,6 @@
 
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@suid/material";
-import { For, createSignal } from "solid-js";
+import { For } from "solid-js";
 import { graphql } from "~/gql";
 import { createSubscription } from '@merged/solid-apollo'
 
