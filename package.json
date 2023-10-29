@@ -34,7 +34,7 @@
     "@solidjs/router": "^0.8.2",
     "@suid/icons-material": "^0.6.10",
     "@suid/material": "^0.15.0",
-    "@supabase/supabase-js": "^2.36.0",
+    "@supabase/supabase-js": "^2.38.4",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
     "graphql": "^16.8.1",
