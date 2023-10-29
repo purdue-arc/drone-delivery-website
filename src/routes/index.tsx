@@ -25,9 +25,9 @@ export default function Home() {
       shouldAnimate: true,
       homeButton: false,
       animation: true,
-      
+
     });
-  
+
     const dronesController = new DronesController(viewer, setPopupPos);
 
     // https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceCameraController.html
@@ -58,7 +58,7 @@ export default function Home() {
     viewer.clock.multiplier = 10;
     viewer.timeline.zoomTo(start, stop);
     function computeCirclularFlight(lon: number, lat: number, radius: number) {
-      
+
       const property = new Cesium.SampledPositionProperty();
       for (let i = 0; i <= 360; i += 45) {
         const radians = Cesium.Math.toRadians(i);
@@ -197,7 +197,7 @@ export default function Home() {
           activeShape = drawShape(dynamicPositions);
         }
         createPoint(earthPosition);
-        
+
         activeShapePoints.push(earthPosition);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -228,8 +228,8 @@ export default function Home() {
     }
 
     // End the shape
-    handler.setInputAction(function () {      
-      
+    handler.setInputAction(function () {
+
       let pos = Cesium.Cartographic.fromCartesian(activeShapePoints[0]);
       let pos1 = [pos.longitude / Math.PI * 180, pos.latitude / Math.PI * 180];
       let pos2 = Cesium.Cartographic.fromCartesian(activeShapePoints[1]);
@@ -244,20 +244,20 @@ export default function Home() {
           }),
         ]),
         // convert x and y to lon and lat
-       
+
 
         //Use our computed positions
         position: Cesium.Cartesian3.fromDegrees(pos1[0], pos1[1], 1750),
-  
+
         //Automatically compute orientation based on position movement.
         orientation: new Cesium.VelocityOrientationProperty(position),
-  
+
         //Load the Cesium plane model to represent the entity
         model: {
           uri: "../../public/assets/TwoSidedPlane.gltf",
           minimumPixelSize: 64,
         },
-  
+
         //Show the path as a pink line sampled in 1 second increments.
         path: {
           resolution: 1,
@@ -308,7 +308,7 @@ export default function Home() {
       })
     );
 
-    // dronesController.addDrone(PURDUE_LOCATION, 10);
+    dronesController.addDrone(PURDUE_LOCATION, 10);
   });
 
   let altPressed = false;

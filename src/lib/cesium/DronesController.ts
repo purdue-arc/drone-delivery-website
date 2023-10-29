@@ -60,8 +60,6 @@ export default class DronesController {
    * @see https://sandcastle.cesium.com/?src=3D%20Models.html
    */
   addDrone(location: Cartesian3, height: number) {
-    this.viewer.entities.removeAll();
-
     const position = location.clone();
     position.z += height;
     const heading = Cesium.Math.toRadians(135);
