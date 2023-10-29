@@ -1,4 +1,4 @@
-import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@suid/material";
+import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Button} from "@suid/material";
 import {For} from "solid-js";
 
 function createData(
@@ -20,11 +20,17 @@ const rows = [
 ];
 
 
-export default function Drones() {
+export default function Flights() {
   return (
     <Box padding={2}>
         
-      <Typography variant="h3">All Flights</Typography>
+
+    <Typography variant="h3">All Flights</Typography>
+    <Box sx={{display: "flex", justifyContent: "flex-end", mb: 2}}>
+        <Button variant="contained" color="primary" href="/flights/create" sx={{marginLeft: "auto"}}>
+            Create Flight
+        </Button>
+    </Box>
       {/*TODO: no clue where borderColor came from*/}
       {/* Adapted from: https://mui.com/material-ui/react-table/#basic-table */}
       <TableContainer sx={{borderRadius: 2, border: 1, borderColor: "rgba(224.4, 224.4, 224.4, 1)"}} component={Paper}>
