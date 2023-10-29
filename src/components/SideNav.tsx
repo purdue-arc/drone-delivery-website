@@ -3,6 +3,7 @@ import {type Accessor, children, Component, createContext, createSignal, useCont
 import FlightIcon from '@suid/icons-material/Flight';
 import MapIcon from '@suid/icons-material/Map';
 import HistoryIcon from '@suid/icons-material/History';
+import FlighstIcon from '@suid/icons-material/FlightLand';
 import type {SvgIconProps} from "@suid/material/SvgIcon";
 import {useNavigate} from "@solidjs/router";
 
@@ -98,6 +99,7 @@ export default function SideNav() {
           <NavRow href={"/"} label="Map" icon={MapIcon} />
           <NavRow href={"/history"} label="History" icon={HistoryIcon} />
           <NavRow href={"/drones"} label="Drones" icon={FlightIcon} />
+          <NavRow href={"/flights/list"} label="Flights" icon={FlighstIcon} />
         </OpenContext.Provider>
       </List>
     </TinyDrawer>
