@@ -27,12 +27,12 @@ export default function Home() {
   // TODO: can all of these signals be moved inside onMount? is there React-like restriction?
   const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
-  const dronesPos = createSubscription(dronesPosQuery);
-  const drones: Record<number, Entity> = {};
 
   onMount(() => {
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
 
+    const dronesPos = createSubscription(dronesPosQuery);
+    const drones: Record<number, Entity> = {};
     const viewer = new Cesium.Viewer("cesiumContainer", {
       selectionIndicator: false,
       infoBox: false,
@@ -126,10 +126,10 @@ export default function Home() {
       const startPosition = Cesium.Cartesian3.fromDegrees(startLon, startLat, 1000);
       const endPosition = Cesium.Cartesian3.fromDegrees(endLon, endLat, 1000);
       property.addSample(start, startPosition);
-      property.addSample(time, endPosition);  
+      property.addSample(time, endPosition);
       return property;
     }
-    
+
 
     function createPoint(worldPosition: Cartesian3) {
       const point = viewer.entities.add({
@@ -225,7 +225,7 @@ export default function Home() {
     }
 
     // End the shape
-    handler.setInputAction(function () {      
+    handler.setInputAction(function () {
       let pos = Cesium.Cartographic.fromCartesian(activeShapePoints[0]);
       let pos1 = [pos.longitude / Math.PI * 180, pos.latitude / Math.PI * 180];
       let pos2 = Cesium.Cartographic.fromCartesian(activeShapePoints[1]);
@@ -241,10 +241,10 @@ export default function Home() {
             stop: stop,
           }),
         ]),
-      
+
         //Use our computed positions
         position: position,
-  
+
         //Automatically compute orientation based on position movement.
         orientation: new Cesium.VelocityOrientationProperty(position),
 
@@ -253,7 +253,7 @@ export default function Home() {
           uri: "../../public/assets/TwoSidedPlane.gltf",
           minimumPixelSize: 64,
         },
-        
+
         //Show the path as a pink line sampled in 1 second increments.
         path: {
           resolution: 1,
@@ -265,12 +265,12 @@ export default function Home() {
         },
       });
       viewer.trackedEntity = entity1;
-      // hide the path after journey 
+      // hide the path after journey
       const duration = Cesium.JulianDate.secondsDifference(stop, start);
       console.log(duration)
       setTimeout(() => {
         viewer.entities.remove(entity1);
-      }, duration * 1000); 
+      }, duration * 1000);
       terminateShape();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
