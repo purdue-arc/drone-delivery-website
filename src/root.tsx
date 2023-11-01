@@ -1,14 +1,29 @@
 // @refresh reload
-import {Suspense} from "solid-js";
-import {Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title,} from "solid-start";
+import { Suspense, createEffect, createSignal } from "solid-js";
+import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title, } from "solid-start";
 import "./root.css";
 import SideNav from "~/components/SideNav";
-import {Box, useTheme} from "@suid/material";
-import {ApolloProvider} from "@merged/solid-apollo";
+import { Box, useTheme } from "@suid/material";
+import { ApolloProvider } from "@merged/solid-apollo";
 import gqlClient from "~/lib/gqlClient";
+import { AuthSession } from "@supabase/supabase-js";
+import Auth from "./routes/signin";
+import { supabase } from "./supabaseClient";
 
 export default function Root() {
   const theme = useTheme();
+
+  const [session, setSession] = createSignal<AuthSession | null>(null)
+
+  createEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  })
 
   return (
     <Html lang="en">
@@ -20,15 +35,17 @@ export default function Root() {
       <Body>
         <Suspense>
           <ErrorBoundary>
-            <ApolloProvider client={gqlClient}>
-              <SideNav />
-              {/* TODO: This is JUST a few pixels off. https://mui.com/material-ui/customization/breakpoints/ might help? */}
-              <Box sx={{ paddingLeft: theme.spacing(7) }}>
-                <Routes>
-                  <FileRoutes />
-                </Routes>
-              </Box>
-            </ApolloProvider>
+            {!session() ? <Auth /> :
+              <ApolloProvider client={gqlClient}>
+                <SideNav />
+                {/* TODO: This is JUST a few pixels off. https://mui.com/material-ui/customization/breakpoints/ might help? */}
+                <Box sx={{ paddingLeft: theme.spacing(7) }}>
+                  <Routes>
+                    <FileRoutes />
+                  </Routes>
+                </Box>
+              </ApolloProvider>
+            }
           </ErrorBoundary>
         </Suspense>
         <Scripts />
