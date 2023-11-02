@@ -55,7 +55,7 @@ const TinyDrawer = styled(Drawer, { skipProps: ['open'] })(
   }),
 );
 
-function NavRow({ href, label, icon }: { href: string, label: string, icon: Component<SvgIconProps> }) {
+function NavRow({ href, onClick, label, icon }: { label: string, icon: Component<SvgIconProps> } & ({ onClick: () => void } | { href: string })) {
   const isOpen = useContext(OpenContext);
   const safeIcon = children(() => icon({}));
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ function NavRow({ href, label, icon }: { href: string, label: string, icon: Comp
           justifyContent: isOpen() ? 'initial' : 'center',
           px: 2.5,
         }}
-        onClick={() => navigate(href)}
+        onClick={onClick ?? navigate.bind(this, href)}
       >
         <ListItemIcon
           sx={{
@@ -106,29 +106,7 @@ export default function SideNav() {
           <NavRow href={"/history"} label="History" icon={HistoryIcon} />
           <NavRow href={"/drones"} label="Drones" icon={FlightIcon} />
           <NavRow href={"/flights/list"} label="Flights" icon={FlighstIcon} />
-
-          {/* TODO: Refactor this */}
-          <ListItem disablePadding sx={{ display: 'block' }}>
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: isOpen() ? 'initial' : 'center',
-                px: 2.5,
-              }}
-              onClick={signOut}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: isOpen() ? 3 : 'auto',
-                  justifyContent: 'center',
-                }}
-              >
-                {LogoutIcon({})}
-              </ListItemIcon>
-              <ListItemText primary='Logout' sx={{ opacity: isOpen() ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
+          <NavRow onClick={signOut} label="Logout" icon={LogoutIcon} />
         </OpenContext.Provider>
       </List>
     </TinyDrawer>
