@@ -1,20 +1,24 @@
-import { createSignal } from 'solid-js'
-import { supabase } from '~/lib/supabaseClient'
-import { Box, Avatar, Typography, TextField, Button } from '@suid/material'
+import {createSignal} from 'solid-js'
+import {supabase} from '~/lib/supabaseClient'
+import {Avatar, Box, Button, TextField, Typography} from '@suid/material'
+import {type SignInWithPasswordCredentials} from "@supabase/supabase-js";
 
 export default function Auth() {
   const [loading, setLoading] = createSignal(false)
 
   const handleLogin = async (e: SubmitEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+    // TODO: use material UI's validation UI
+    if (!(e.target as HTMLFormElement).reportValidity())
+      return;
     const formData = new FormData(e.target as HTMLFormElement)
 
     try {
       setLoading(true)
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      })
+        email: formData.get("email") ?? "",
+        password: formData.get("password") ?? "",
+      } as SignInWithPasswordCredentials)
       console.log(data)
     } catch (error) {
       if (error instanceof Error) {
