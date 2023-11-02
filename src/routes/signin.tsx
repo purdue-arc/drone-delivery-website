@@ -1,23 +1,19 @@
 import { createSignal } from 'solid-js'
 import { supabase } from '~/lib/supabaseClient'
-import { Copyright } from '@suid/icons-material'
-import { ThemeProvider, CssBaseline, Box, Avatar, Typography, TextField, FormControlLabel, Checkbox, Button, Grid } from '@suid/material'
-import { Container } from 'postcss'
-import { Link } from 'solid-start'
+import { Box, Avatar, Typography, TextField, Button } from '@suid/material'
 
 export default function Auth() {
   const [loading, setLoading] = createSignal(false)
-  const [email, setEmail] = createSignal('')
-  const [password, setPassword] = createSignal('')
 
   const handleLogin = async (e: SubmitEvent) => {
     e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
 
     try {
       setLoading(true)
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email(),
-        password: password(),
+        email: formData.get("email"),
+        password: formData.get("password"),
       })
       console.log(data)
     } catch (error) {
@@ -53,8 +49,6 @@ export default function Auth() {
             name="email"
             autoComplete="email"
             autoFocus
-            value={email()}
-            onChange={(e) => setEmail(e.currentTarget.value)}
           />
           <TextField
             margin="normal"
@@ -65,8 +59,6 @@ export default function Auth() {
             type="password"
             id="password"
             autoComplete="current-password"
-            value={password()}
-            onChange={(e) => setPassword(e.currentTarget.value)}
           />
           <Button
             type="submit"

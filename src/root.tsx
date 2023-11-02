@@ -1,21 +1,21 @@
 // @refresh reload
-import { Suspense, createEffect, createSignal } from "solid-js";
-import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title, } from "solid-start";
+import {createSignal, onMount, Suspense} from "solid-js";
+import {Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title,} from "solid-start";
 import "./root.css";
 import SideNav from "~/components/SideNav";
-import { Box, useTheme } from "@suid/material";
-import { ApolloProvider } from "@merged/solid-apollo";
+import {Box, useTheme} from "@suid/material";
+import {ApolloProvider} from "@merged/solid-apollo";
 import gqlClient from "~/lib/gqlClient";
-import { AuthSession } from "@supabase/supabase-js";
+import {AuthSession} from "@supabase/supabase-js";
 import Auth from "./routes/signin";
-import { supabase } from "./lib/supabaseClient";
+import {supabase} from "./lib/supabaseClient";
 
 export default function Root() {
   const theme = useTheme();
 
   const [session, setSession] = createSignal<AuthSession | null>(null)
 
-  createEffect(() => {
+  onMount(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
