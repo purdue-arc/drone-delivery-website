@@ -8,7 +8,7 @@ import { ApolloProvider } from "@merged/solid-apollo";
 import gqlClient from "~/lib/gqlClient";
 import { AuthSession } from "@supabase/supabase-js";
 import Auth from "./routes/signin";
-import { supabase } from "./supabaseClient";
+import { supabase } from "./lib/supabaseClient";
 
 export default function Root() {
   const theme = useTheme();

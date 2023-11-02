@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import { supabase } from './../supabaseClient'
+import { supabase } from '~/lib/supabaseClient'
 import { Copyright } from '@suid/icons-material'
 import { ThemeProvider, CssBaseline, Box, Avatar, Typography, TextField, FormControlLabel, Checkbox, Button, Grid } from '@suid/material'
 import { Container } from 'postcss'

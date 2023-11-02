@@ -7,7 +7,7 @@ import FlighstIcon from '@suid/icons-material/FlightLand';
 import LogoutIcon from '@suid/icons-material/Logout';
 import type { SvgIconProps } from "@suid/material/SvgIcon";
 import { useNavigate } from "@solidjs/router";
-import { supabase } from "~/supabaseClient";
+import { supabase } from "~/lib/supabaseClient";
 
 
 const OpenContext = createContext<Accessor<boolean>>(() => false);
