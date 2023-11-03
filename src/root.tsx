@@ -31,6 +31,7 @@ export default function Root() {
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Body>
+        {/* Suspense docs: https://docs.solidjs.com/references/api-reference/control-flow/Suspense */}
         <Suspense>
           <ErrorBoundary>
             {!session() ? <Auth /> :
