@@ -1,11 +1,13 @@
-import {Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, type Theme} from "@suid/material";
-import {type Accessor, children, Component, createContext, createSignal, useContext} from "solid-js";
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, type Theme } from "@suid/material";
+import { type Accessor, children, Component, createContext, createSignal, useContext } from "solid-js";
 import FlightIcon from '@suid/icons-material/Flight';
 import MapIcon from '@suid/icons-material/Map';
 import HistoryIcon from '@suid/icons-material/History';
 import FlighstIcon from '@suid/icons-material/FlightLand';
-import type {SvgIconProps} from "@suid/material/SvgIcon";
-import {useNavigate} from "@solidjs/router";
+import LogoutIcon from '@suid/icons-material/Logout';
+import type { SvgIconProps } from "@suid/material/SvgIcon";
+import { useNavigate } from "@solidjs/router";
+import { supabase } from "~/lib/supabaseClient";
 
 
 const OpenContext = createContext<Accessor<boolean>>(() => false);
@@ -53,7 +55,7 @@ const TinyDrawer = styled(Drawer, { skipProps: ['open'] })(
   }),
 );
 
-function NavRow({href, label, icon}: {href: string, label: string, icon: Component<SvgIconProps>}) {
+function NavRow({ href, onClick, label, icon }: { label: string, icon: Component<SvgIconProps> } & ({ onClick: () => void } | { href: string })) {
   const isOpen = useContext(OpenContext);
   const safeIcon = children(() => icon({}));
   const navigate = useNavigate();
@@ -66,7 +68,7 @@ function NavRow({href, label, icon}: {href: string, label: string, icon: Compone
           justifyContent: isOpen() ? 'initial' : 'center',
           px: 2.5,
         }}
-        onClick={() => navigate(href)}
+        onClick={onClick ?? navigate.bind(this, href)}
       >
         <ListItemIcon
           sx={{
@@ -81,6 +83,10 @@ function NavRow({href, label, icon}: {href: string, label: string, icon: Compone
       </ListItemButton>
     </ListItem>
   );
+}
+
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
 }
 
 
@@ -100,6 +106,7 @@ export default function SideNav() {
           <NavRow href={"/history"} label="History" icon={HistoryIcon} />
           <NavRow href={"/drones"} label="Drones" icon={FlightIcon} />
           <NavRow href={"/flights/list"} label="Flights" icon={FlighstIcon} />
+          <NavRow onClick={signOut} label="Logout" icon={LogoutIcon} />
         </OpenContext.Provider>
       </List>
     </TinyDrawer>
