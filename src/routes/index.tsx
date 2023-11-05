@@ -174,9 +174,9 @@ export default function Home() {
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
-      const selectedDrone = dronesController.tryPickDrone(event.position, activeShapePoints.length > 0);
+      const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position, activeShapePoints.length > 0);
       setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "-1"));
-      if (selectedDrone == undefined) {
+      if (stateChanged) {
         return;
       }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that

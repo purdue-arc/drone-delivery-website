@@ -37,19 +37,23 @@ export default class DronesController {
    * Determines if click event is on top of drone and updates state accordingly
    * @param clickPos the position the click event occurred at
    * @param pathActive whether or not a flight path is currently being drawn. If it is, disallow selecting drones
-   * @returns the currently selected drone or undefined if none selected
+   * @returns tuple:
+   *     1st index: the currently selected drone or undefined if none selected
+   *     2nd index: true if a drone was selected/unselected, false otherwise
    */
-  tryPickDrone(clickPos: Cartesian2, pathActive: boolean): Entity | undefined {
+  tryPickDrone(clickPos: Cartesian2, pathActive: boolean): [Entity | undefined, boolean] {
     const pickedEntity = pickEntity(this.viewer, clickPos);
     if (pickedEntity && !pathActive) {  // Select drone only if no active path
       this.selectedDrone = pickedEntity;
       this.updatePopupPos();
+      return [this.selectedDrone, true];
     }
     if (!pickedEntity && this.selectedDrone) {  // Unselect drone, don't start drawing path
       this.selectedDrone = undefined;
       this.updatePopupPos();
+      return [this.selectedDrone, true];
     }
-    return this.selectedDrone;
+    return [this.selectedDrone, false];
   }
 
   /** Change position of a Cesium entity
