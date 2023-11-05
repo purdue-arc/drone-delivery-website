@@ -27,6 +27,7 @@ export default function Home() {
   // TODO: can all of these signals be moved inside onMount? is there React-like restriction?
   const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
+  const [selectedDroneId, setSelectedDroneId] = createSignal(-1);
 
   onMount(() => {
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
@@ -53,7 +54,7 @@ export default function Home() {
         if (drone.id in drones) {
           dronesController.setDronePos(drones[drone.id], drone.longitude, drone.latitude, drone.altitude, drone.heading);
         } else {
-          drones[drone.id] = dronesController.addDrone(drone.longitude, drone.latitude, drone.altitude, drone.heading);
+          drones[drone.id] = dronesController.addDrone(drone.id, drone.longitude, drone.latitude, drone.altitude, drone.heading);
         }
       }
     });
@@ -173,7 +174,9 @@ export default function Home() {
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
-      if (dronesController.tryPickDrone(event.position, activeShapePoints.length > 0)) {
+      const selectedDrone = dronesController.tryPickDrone(event.position, activeShapePoints.length > 0);
+      setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "-1"));
+      if (selectedDrone == undefined) {
         return;
       }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
@@ -333,7 +336,7 @@ export default function Home() {
       <div id="cesiumContainer"></div>
       <Show when={popupPos()?.x && popupPos()?.y}>
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
-          <DroneTooltipContents />
+          <DroneTooltipContents id={selectedDroneId()} />
         </Tooltip>
       </Show>
       <Index each={points()}>{(point, i) => <li>{point()}</li>}</Index>

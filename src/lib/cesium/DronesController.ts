@@ -37,21 +37,19 @@ export default class DronesController {
    * Determines if click event is on top of drone and updates state accordingly
    * @param clickPos the position the click event occurred at
    * @param pathActive whether or not a flight path is currently being drawn. If it is, disallow selecting drones
-   * @returns true if a drone was selected/unselected, false otherwise
+   * @returns the currently selected drone or undefined if none selected
    */
-  tryPickDrone(clickPos: Cartesian2, pathActive: boolean): boolean {
+  tryPickDrone(clickPos: Cartesian2, pathActive: boolean): Entity | undefined {
     const pickedEntity = pickEntity(this.viewer, clickPos);
     if (pickedEntity && !pathActive) {  // Select drone only if no active path
       this.selectedDrone = pickedEntity;
       this.updatePopupPos();
-      return true;
     }
     if (!pickedEntity && this.selectedDrone) {  // Unselect drone, don't start drawing path
       this.selectedDrone = undefined;
       this.updatePopupPos();
-      return true;
     }
-    return false;
+    return this.selectedDrone;
   }
 
   /** Change position of a Cesium entity
@@ -74,15 +72,16 @@ export default class DronesController {
   }
 
   /** Add a drone to the Cesium scene at provided location
+   * @param id identifier of this drone in the database
    * @param height distance from WGS84 reference ellipsoid to place drone (what you get from GPS)
    * @param heading compass direction (deg) to point in. 0 is north, increase clockwise
    * @see https://sandcastle.cesium.com/?src=3D%20Models.html
    */
-  addDrone(longitude: number, latitude: number, height: number, heading: number) {
+  addDrone(id: number, longitude: number, latitude: number, height: number, heading: number) {
     const url = "drone.glb";
     return this.setDronePos(
       this.viewer.entities.add({
-        //name: url,  // I don't think this is actually important, but keeping just in case
+        name: String(id),
         model: {
           uri: url,
           // This config is responsible for keeping the drone at constant size while zooming out
