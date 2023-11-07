@@ -28,6 +28,12 @@ export default function Home() {
   const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
   const [selectedDroneId, setSelectedDroneId] = createSignal(-1);
+  const [isDrawingPath, setIsDrawingPath] = createSignal(false);
+
+  function startDrawingPath() {
+    setIsDrawingPath(true);
+    setPopupPos(undefined);
+  }
 
   onMount(() => {
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
@@ -73,6 +79,7 @@ export default function Home() {
     viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
     );
+
     // set simulation time
     // const start = Cesium.JulianDate.fromDate(new Date(2023, 9, 23, 10));
     const start = Cesium.JulianDate.fromDate(new Date(2023, 9, 24, 10));
@@ -85,8 +92,14 @@ export default function Home() {
     viewer.clock.stopTime = stop.clone();
     viewer.clock.currentTime = start.clone();
     viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP; //Loop at the end
-    viewer.clock.multiplier = 10;
     viewer.timeline.zoomTo(start, stop);
+
+    viewer.animation.viewModel.timeFormatter = function(julianDate, viewModel) {
+      // TODO: format the timeline in local time
+      const date = Cesium.JulianDate.toDate(julianDate);
+      return `LMAO ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    };
+
     function computeCirclularFlight(lon: number, lat: number, radius: number) {
 
       const property = new Cesium.SampledPositionProperty();
@@ -175,8 +188,9 @@ export default function Home() {
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position, activeShapePoints.length > 0);
-      setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "-1"));
-      if (stateChanged) {
+      if (!isDrawingPath())
+        setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "-1"));
+      if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
         return;
       }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
@@ -220,15 +234,17 @@ export default function Home() {
     function terminateShape() {
       activeShapePoints.pop();
       drawShape(activeShapePoints);
-      // viewer.entities.remove(floatingPoint);
+      viewer.entities.remove(floatingPoint);
       // viewer.entities.remove(activeShape);
-      // floatingPoint = undefined;
+      floatingPoint = undefined;
       // activeShape = undefined;
       activeShapePoints = [];
     }
 
     // End the shape
     handler.setInputAction(function () {
+      setIsDrawingPath(false);
+      setSelectedDroneId(-1);
       let pos = Cesium.Cartographic.fromCartesian(activeShapePoints[0]);
       let pos1 = [pos.longitude / Math.PI * 180, pos.latitude / Math.PI * 180];
       let pos2 = Cesium.Cartographic.fromCartesian(activeShapePoints[1]);
@@ -336,7 +352,7 @@ export default function Home() {
       <div id="cesiumContainer"></div>
       <Show when={popupPos()?.x && popupPos()?.y}>
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
-          <DroneTooltipContents id={selectedDroneId()} />
+          <DroneTooltipContents id={selectedDroneId()} onStartDrawingPath={startDrawingPath} />
         </Tooltip>
       </Show>
       <Index each={points()}>{(point, i) => <li>{point()}</li>}</Index>
