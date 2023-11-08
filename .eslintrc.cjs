@@ -10,10 +10,12 @@ module.exports = {
 		"solid",
 		"unused-imports",
 		"@stylistic/js",
+		"jsdoc",  // https://www.npmjs.com/package/eslint-plugin-jsdoc
 	],
 	"extends": [
 		"plugin:solid/typescript",
 		"eslint:recommended",
+		"plugin:jsdoc/recommended-typescript",
 	],
 	parserOptions: {
 		ecmaVersion: 2020,
