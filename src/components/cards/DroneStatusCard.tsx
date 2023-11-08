@@ -3,13 +3,13 @@ import {
   PlaceOutlined as PlaceIcon,
   SpeedOutlined as SpeedIcon
 } from '@suid/icons-material';
-import {Match, Switch} from "solid-js/web";
 import {Box, Button, Card, Grid, Stack, styled, Typography} from "@suid/material";
 import {useParams} from "@solidjs/router";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
 import {createEffect, Show} from "solid-js";
 import BatteryIcon from "~/components/BatteryIcon";
+import DroneWarnings from "~/DroneWarnings";
 
 const statusQuery = graphql(`
     subscription DroneInfo($droneId: bigint!) {
@@ -40,7 +40,6 @@ const statusQuery = graphql(`
 // TODO: placed_at is currently unused
 
 const LoadingElem = () => <span>Drone has not produced enough data</span>;
-const CONCERNING_LAG = 5000;  // in ms
 
 
 const TelemetryRow = styled('p')({
@@ -55,7 +54,6 @@ export default function DroneStatusCard() {
   const droneInfo = createSubscription(statusQuery, {variables: {droneId: params.id}});
   const telemetry = () => droneInfo()?.me?.telemetry[0];
   const flight = () => droneInfo()?.me?.flights[0];
-  const timeSinceUpdate = () => new Date().getTime() - telemetry()?.timestamp ?? 0;
   createEffect(() => console.log(droneInfo()));
 
   return (
@@ -91,17 +89,7 @@ export default function DroneStatusCard() {
           <Grid item container direction="column" width={500}>
             <Grid item sx={{flexGrow: 99, textAlign: "center"}}>
               <Typography sx={{ fontSize: '2em', fontWeight: 'bold' }}>Drone {params.id}</Typography>
-              <Switch fallback={<Typography>✅ Operational</Typography>}>
-                <Match when={timeSinceUpdate() > CONCERNING_LAG}>
-                  <Typography>🚨 {Math.floor(timeSinceUpdate() / 1000)} seconds since last update</Typography>
-                </Match>
-                <Match when={telemetry()!.battery < 20}>
-                  <Typography>⚠️ Low battery</Typography>
-                </Match>
-                <Match when={telemetry()!.stage_of_flight !== "idle" && flight()!.status === "failed"}>
-                  <Typography>🚨 Crashed</Typography>
-                </Match>
-              </Switch>
+              <DroneWarnings id={params.id} ok={<Typography>✅ Operational</Typography>} />
               {/* TODO: intelligently report states such as: Delivering to ___/picking up from _____/parking at */}
               <Show when={telemetry()!.stage_of_flight === "in_flight"} fallback={<Typography>{telemetry()!.stage_of_flight}</Typography>}>
                 <Typography>{telemetry()!.has_package ? "Delivering" : "Picking up"} from {flight()!.order!.vendor!.name}</Typography>
