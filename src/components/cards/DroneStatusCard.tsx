@@ -10,6 +10,7 @@ import {createSubscription} from "@merged/solid-apollo";
 import {createEffect, Show} from "solid-js";
 import BatteryIcon from "~/components/BatteryIcon";
 import DroneWarnings from "~/DroneWarnings";
+import ReadableDestination from "~/components/ReadableDestination";
 
 const statusQuery = graphql(`
     subscription DroneInfo($droneId: bigint!) {
@@ -18,20 +19,13 @@ const statusQuery = graphql(`
                 altitude
                 battery
                 heading
-                has_package
                 latitude
                 longitude
-                stage_of_flight
-                timestamp
                 velocity
             }
             flights(limit: 1, order_by: {flight_id: desc}) {
-                status
                 order {
                     placed_at
-                    vendor {
-                        name
-                    }
                 }
             }
         }
@@ -90,10 +84,7 @@ export default function DroneStatusCard() {
             <Grid item sx={{flexGrow: 99, textAlign: "center"}}>
               <Typography sx={{ fontSize: '2em', fontWeight: 'bold' }}>Drone {params.id}</Typography>
               <DroneWarnings id={params.id} ok={<Typography>✅ Operational</Typography>} />
-              {/* TODO: intelligently report states such as: Delivering to ___/picking up from _____/parking at */}
-              <Show when={telemetry()!.stage_of_flight === "in_flight"} fallback={<Typography>{telemetry()!.stage_of_flight}</Typography>}>
-                <Typography>{telemetry()!.has_package ? "Delivering" : "Picking up"} from {flight()!.order!.vendor!.name}</Typography>
-              </Show>
+              <ReadableDestination id={params.id} />
             </Grid>
             <Grid item>
               <Stack spacing={2} direction="row" justifyContent="right">
