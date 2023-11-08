@@ -3,14 +3,15 @@ import {
   PlaceOutlined as PlaceIcon,
   SpeedOutlined as SpeedIcon
 } from '@suid/icons-material';
-import {Box, Button, Card, Grid, Stack, styled, Typography} from "@suid/material";
+import {Box, Button, Card, Grid, Stack, Typography} from "@suid/material";
 import {useParams} from "@solidjs/router";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
 import {createEffect, Show} from "solid-js";
-import BatteryIcon from "~/components/BatteryIcon";
-import DroneWarnings from "~/DroneWarnings";
-import ReadableDestination from "~/components/ReadableDestination";
+import DroneWarnings from "~/components/info-fragments/DroneWarnings";
+import ReadableDestination from "~/components/info-fragments/ReadableDestination";
+import LabeledIcon from "~/components/generic/LabeledIcon";
+import BatteryFragment from "~/components/info-fragments/BatteryFragment";
 
 const statusQuery = graphql(`
     subscription DroneInfo($droneId: bigint!) {
@@ -36,13 +37,6 @@ const statusQuery = graphql(`
 const LoadingElem = <span>Drone has not produced enough data</span>;
 
 
-const TelemetryRow = styled('p')({
-  display: "flex",
-  alignItems: "center",
-  lineHeight: 0,
-});
-
-
 export default function DroneStatusCard() {
   const params = useParams();
   const droneInfo = createSubscription(statusQuery, {variables: {droneId: params.id}});
@@ -63,22 +57,19 @@ export default function DroneStatusCard() {
             <Box sx={{textAlign: "center"}}>
               <img src="/drone.jpg" width="150px"  alt="Drone" />
             </Box>
-            <TelemetryRow>
+            <LabeledIcon>
               <PlaceIcon sx={{ marginRight: '0.5em' }} />
               ({telemetry()!.latitude}, {telemetry()!.longitude})
-            </TelemetryRow>
-            <TelemetryRow>
+            </LabeledIcon>
+            <LabeledIcon>
               <CompassIcon sx={{ marginRight: '0.5em' }} />
               {telemetry()!.heading}
-            </TelemetryRow>
-            <TelemetryRow>
+            </LabeledIcon>
+            <LabeledIcon>
               <SpeedIcon sx={{ marginRight: '0.5em' }} />
               {telemetry()!.velocity} mph
-            </TelemetryRow>
-            <TelemetryRow>
-              <BatteryIcon percent={telemetry()!.battery / 100} />
-              {telemetry()!.battery}%
-            </TelemetryRow>
+            </LabeledIcon>
+            <BatteryFragment id={params.id} />
           </Grid>
           <Grid item container direction="column" width={500}>
             <Grid item sx={{flexGrow: 99, textAlign: "center"}}>
