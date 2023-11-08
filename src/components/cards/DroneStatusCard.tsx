@@ -39,7 +39,7 @@ const statusQuery = graphql(`
 `)
 // TODO: placed_at is currently unused
 
-const LoadingElem = () => <span>Drone has not produced enough data</span>;
+const LoadingElem = <span>Drone has not produced enough data</span>;
 
 
 const TelemetryRow = styled('p')({
@@ -62,7 +62,7 @@ export default function DroneStatusCard() {
       {/* TODO: is there an async way of doing this?*/}
       <Show
         when={telemetry() && flight()}
-        fallback={LoadingElem()}
+        fallback={LoadingElem}
       >
         <Grid container spacing={2}>
           <Grid item>

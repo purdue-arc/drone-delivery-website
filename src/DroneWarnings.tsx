@@ -2,7 +2,7 @@ import {Typography} from "@suid/material";
 import {Match, Switch} from "solid-js/web";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
-import {createEffect, ErrorBoundary, type JSX, Show, Suspense} from "solid-js";
+import {type JSX, Show} from "solid-js";
 
 const warningsQuery = graphql(`
     subscription DroneWarnings($droneId: bigint!) {
@@ -27,30 +27,21 @@ export default function DroneWarnings(props: {id: number | string, ok?: JSX.Elem
   const flight = () => droneWarnings()?.me?.flights[0];
   const timeSinceUpdate = () => new Date().getTime() - telemetry()?.timestamp ?? 0;
 
-  createEffect(() => {
-    console.log("warnings", droneWarnings());
-  })
-
   return (
-    <ErrorBoundary fallback={<p>There's been an error :C</p>}>
-    <Suspense fallback={<p>Suspense waiting</p>}>
-      <Show
-        when={telemetry() && flight()}
-        fallback={<p>Show waiting...</p>}
-      >
-        <Switch fallback={props.ok}>
-          <Match when={timeSinceUpdate() > CONCERNING_LAG}>
-            <Typography>🚨 {Math.floor(timeSinceUpdate() / 1000)} seconds since last update</Typography>
-          </Match>
-          <Match when={telemetry()!.battery < 20}>
-            <Typography>⚠️ Low battery</Typography>
-          </Match>
-          <Match when={telemetry()!.stage_of_flight !== "idle" && flight()!.status === "failed"}>
-            <Typography>🚨 Crashed</Typography>
-          </Match>
-        </Switch>
-      </Show>
-    </Suspense>
-    </ErrorBoundary>
+    <Show
+      when={telemetry() && flight()}
+    >
+      <Switch fallback={props.ok}>
+        <Match when={timeSinceUpdate() > CONCERNING_LAG}>
+          <Typography>🚨 {Math.floor(timeSinceUpdate() / 1000)} seconds since last update</Typography>
+        </Match>
+        <Match when={telemetry()!.battery < 20}>
+          <Typography>⚠️ Low battery</Typography>
+        </Match>
+        <Match when={telemetry()!.stage_of_flight !== "idle" && flight()!.status === "failed"}>
+          <Typography>🚨 Crashed</Typography>
+        </Match>
+      </Switch>
+    </Show>
   );
 }

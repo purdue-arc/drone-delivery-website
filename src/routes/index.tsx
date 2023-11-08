@@ -27,7 +27,8 @@ export default function Home() {
   // TODO: can all of these signals be moved inside onMount? is there React-like restriction?
   const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
-  const [selectedDroneId, setSelectedDroneId] = createSignal(-1);
+  // NaN represents no drone is selected. Using instead of -1 because it makes logical mistakes more evident
+  const [selectedDroneId, setSelectedDroneId] = createSignal(NaN);
   const [isDrawingPath, setIsDrawingPath] = createSignal(false);
 
   function startDrawingPath() {
@@ -189,7 +190,7 @@ export default function Home() {
     handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position, activeShapePoints.length > 0);
       if (!isDrawingPath())
-        setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "-1"));
+        setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "NaN"));
       if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
         return;
       }
@@ -244,7 +245,7 @@ export default function Home() {
     // End the shape
     handler.setInputAction(function () {
       setIsDrawingPath(false);
-      setSelectedDroneId(-1);
+      setSelectedDroneId(NaN);
       let pos = Cesium.Cartographic.fromCartesian(activeShapePoints[0]);
       let pos1 = [pos.longitude / Math.PI * 180, pos.latitude / Math.PI * 180];
       let pos2 = Cesium.Cartographic.fromCartesian(activeShapePoints[1]);
@@ -350,7 +351,7 @@ export default function Home() {
     <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <div id="drawingOptions"></div>
       <div id="cesiumContainer"></div>
-      <Show when={popupPos()?.x && popupPos()?.y}>
+      <Show when={popupPos()?.x && popupPos()?.y && !isNaN(selectedDroneId())}>
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
           <DroneTooltipContents id={selectedDroneId()} onStartDrawingPath={startDrawingPath} />
         </Tooltip>
