@@ -1,24 +1,15 @@
 import {
-  Battery0Bar,
-  Battery1Bar,
-  Battery2Bar,
-  Battery3Bar,
-  Battery4Bar,
-  Battery5Bar,
-  Battery6Bar,
-  BatteryFull,
   ExploreOutlined as CompassIcon,
   PlaceOutlined as PlaceIcon,
   SpeedOutlined as SpeedIcon
 } from '@suid/icons-material';
-import {Dynamic, Match, Switch} from "solid-js/web";
-import {Box, Button, Card, Grid, Stack, Typography} from "@suid/material";
+import {Match, Switch} from "solid-js/web";
+import {Box, Button, Card, Grid, Stack, styled, Typography} from "@suid/material";
 import {useParams} from "@solidjs/router";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
 import {createEffect, Show} from "solid-js";
-
-const batteryStatus = [Battery0Bar, Battery1Bar, Battery2Bar, Battery3Bar, Battery4Bar, Battery5Bar, Battery6Bar, BatteryFull];
+import BatteryIcon from "~/components/BatteryIcon";
 
 const statusQuery = graphql(`
     subscription DroneInfo($droneId: bigint!) {
@@ -52,6 +43,13 @@ const LoadingElem = () => <span>Drone has not produced enough data</span>;
 const CONCERNING_LAG = 5000;  // in ms
 
 
+const TelemetryRow = styled('p')({
+  display: "flex",
+  alignItems: "center",
+  lineHeight: 0,
+});
+
+
 export default function DroneStatusCard() {
   const params = useParams();
   const droneInfo = createSubscription(statusQuery, {variables: {droneId: params.id}});
@@ -71,24 +69,24 @@ export default function DroneStatusCard() {
         <Grid container spacing={2}>
           <Grid item>
             <Box sx={{textAlign: "center"}}>
-              <img src="/drone.jpg" width="150px" />
+              <img src="/drone.jpg" width="150px"  alt="Drone" />
             </Box>
-            <p>
+            <TelemetryRow>
               <PlaceIcon sx={{ marginRight: '0.5em' }} />
               ({telemetry()!.latitude}, {telemetry()!.longitude})
-            </p>
-            <p>
+            </TelemetryRow>
+            <TelemetryRow>
               <CompassIcon sx={{ marginRight: '0.5em' }} />
               {telemetry()!.heading}
-            </p>
-            <p>
+            </TelemetryRow>
+            <TelemetryRow>
               <SpeedIcon sx={{ marginRight: '0.5em' }} />
               {telemetry()!.velocity} mph
-            </p>
-            <p>
-              <Dynamic component={batteryStatus[Math.round(telemetry()!.battery / 100 * (batteryStatus.length - 1))]} sx={{ marginRight: '0.5em' }} />
+            </TelemetryRow>
+            <TelemetryRow>
+              <BatteryIcon percent={telemetry()!.battery / 100} />
               {telemetry()!.battery}%
-            </p>
+            </TelemetryRow>
           </Grid>
           <Grid item container direction="column" width={500}>
             <Grid item sx={{flexGrow: 99, textAlign: "center"}}>
