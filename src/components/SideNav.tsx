@@ -7,7 +7,7 @@ import FlighstIcon from "@suid/icons-material/FlightLand";
 import LogoutIcon from "@suid/icons-material/Logout";
 import type {SvgIconProps} from "@suid/material/SvgIcon";
 import {useNavigate} from "@solidjs/router";
-import {supabase} from "~/lib/supabaseClient";
+import { nhost } from "~/lib/nHost";
 
 
 const OpenContext = createContext<Accessor<boolean>>(() => false);
@@ -90,7 +90,7 @@ function NavRow(props: { label: string, icon: Component<SvgIconProps> } & ({ onC
 }
 
 async function signOut() {
-  const { error } = await supabase.auth.signOut();
+  await nhost.auth.signOut();
 }
 
 
