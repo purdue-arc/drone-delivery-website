@@ -9,6 +9,9 @@
     "lint": "eslint --ext .tsx,.ts src/ --fix",
     "postinstall": "patch-package"
   },
+  "gitHooks": {
+    "pre-commit": "eslint --ext .tsx,.ts src/"
+  },
   "type": "module",
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",
