@@ -3,6 +3,7 @@ import DroneStatusCard from "~/components/cards/DroneStatusCard";
 import BatteryReleaseChartCard from "~/components/cards/VoltageTimeGraphCard";
 import OrderHistoryCard from "~/components/cards/OrderHistoryCard";
 
+/** Show all the cards relevant to the drone specified in url paramete */
 export default function DroneStatus() {
   // TODO: direct to error page if drone ID doesn't exist
 

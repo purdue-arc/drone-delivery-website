@@ -37,6 +37,10 @@ const statusQuery = graphql(`
 const LoadingElem = <span>Drone has not produced enough data</span>;
 
 
+/**
+ * Card for detailed drone status page. Shows information on location, heading, battery, and speed.
+ * Includes human-readable status & destination info. Has buttons to create a new flight.
+ */
 export default function DroneStatusCard() {
   const params = useParams();
   const droneInfo = createSubscription(statusQuery, {variables: {droneId: params.id}});

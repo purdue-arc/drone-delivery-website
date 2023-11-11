@@ -19,6 +19,7 @@ const orderQuery = graphql(`
 `);
 
 
+/** Card for detailed drone status page. Shows the last n orders for the drone specified in the query parameter */
 export default function OrderHistoryCard() {
   const params = useParams();
   const orders = createSubscription(orderQuery, {variables: {droneId: params.id}});

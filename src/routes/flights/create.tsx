@@ -1,5 +1,13 @@
 import {Box, Button, Typography} from "@suid/material";
 
+/**
+ * TODO: delete
+ * @param name
+ * @param calories
+ * @param fat
+ * @param carbs
+ * @param protein
+ */
 function createData(
   name: string,
   calories: number,
@@ -19,6 +27,7 @@ const rows = [
 ];
 
 
+/** TODO */
 export default function Flights() {
   return (
     <Box padding={2}>

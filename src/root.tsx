@@ -10,6 +10,7 @@ import {AuthSession} from "@supabase/supabase-js";
 import Auth from "./routes/signin";
 import {supabase} from "./lib/supabaseClient";
 
+/** Render the frame common to all routes (navigation, graphql provider, auth) */
 export default function Root() {
   const theme = useTheme();
 

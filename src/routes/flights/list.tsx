@@ -8,10 +8,18 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography
+  Typography,
 } from "@suid/material";
 import {For} from "solid-js";
 
+/**
+ * TODO: delete this
+ * @param name
+ * @param calories
+ * @param fat
+ * @param carbs
+ * @param protein
+ */
 function createData(
   name: string,
   calories: number,
@@ -31,6 +39,7 @@ const rows = [
 ];
 
 
+/** TODO */
 export default function Flights() {
   return (
     <Box padding={2}>

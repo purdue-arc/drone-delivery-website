@@ -26,6 +26,10 @@ const batteryQuery = graphql(`
 const batteryStatus = [Battery0Bar, Battery1Bar, Battery2Bar, Battery3Bar, Battery4Bar, Battery5Bar, Battery6Bar, BatteryFull];
 
 
+/**
+ * Show battery info for specified drone, with dynamic icon (changes depending on charge)
+ * @param props.id id of drone to show battery info for
+ */
 export default function BatteryFragment(props: {id: number | string}) {
   const droneWarnings = createSubscription(batteryQuery, {variables: {droneId: props.id}});
   const battery = () => droneWarnings()?.me?.telemetry[0]?.battery;

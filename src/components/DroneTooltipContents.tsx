@@ -5,6 +5,11 @@ import {Suspense} from "solid-js";
 import ReadableDestination from "~/components/info-fragments/ReadableDestination";
 import BatteryFragment from "~/components/info-fragments/BatteryFragment";
 
+/**
+ * Similar to DroneStatusCard, but only show readable critical information, along with buttons to view details or new flight
+ * @param props.id drone id to show info on
+ * @param props.onStartDrawingPath Call when "New Flight" button pressed
+ */
 export default function DroneTooltipContents(props: {id: number, onStartDrawingPath: () => void}) {
   const navigate = useNavigate();
 

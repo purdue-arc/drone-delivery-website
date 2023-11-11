@@ -3,6 +3,7 @@ import {supabase} from "~/lib/supabaseClient";
 import {Avatar, Box, Button, TextField, Typography} from "@suid/material";
 import {type SignInWithPasswordCredentials} from "@supabase/supabase-js";
 
+/** Login page (username and password) */
 export default function Auth() {
   const [loading, setLoading] = createSignal(false);
 

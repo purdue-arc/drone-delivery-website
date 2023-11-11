@@ -15,6 +15,9 @@ subscription GetDrones {
   }
 }`);
 
+/**
+ * Page with table of all drone info
+ */
 export default function Drones() {
 
   let data = createSubscription(SUBSCRIPTION);

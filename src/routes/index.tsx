@@ -23,6 +23,7 @@ const dronesPosQuery = graphql(`
     }
 `);
 
+/** Home/index page containing the map and ability to create new flights*/
 export default function Home() {
   // TODO: can all of these signals be moved inside onMount? is there React-like restriction?
   const [points, setPoints] = createSignal([] as string[]);

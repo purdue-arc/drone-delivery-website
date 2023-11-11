@@ -55,6 +55,10 @@ const TinyDrawer = styled(Drawer, { skipProps: ["open"] })(
   }),
 );
 
+/**
+ * An icon and label combination for SideNav.
+ * @param props label, icon, and choose between a href to link to or a javascript action when it's clicked
+ */
 function NavRow(props: { label: string, icon: Component<SvgIconProps> } & ({ onClick: () => void } | { href: string })) {
   const isOpen = useContext(OpenContext);
   const safeIcon = children(() => props.icon({}));
@@ -90,6 +94,7 @@ async function signOut() {
 }
 
 
+/** Component for material UI side navigation. Expands and contracts depending on whether cursor hovering */
 export default function SideNav() {
   const [isOpen, setOpen] = createSignal(false);
 

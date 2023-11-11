@@ -20,7 +20,7 @@ module.exports = {
 	parserOptions: {
 		ecmaVersion: 2020,
 	},
-	ignorePatterns: ["**/node_modules/*", "**/dist/*", "**/.solid/*"],
+	ignorePatterns: ["**/node_modules/*", "**/dist/*", "**/.solid/*", "**/gql/*"],
 	rules: {
 		"no-console": isProduction ? "warn" : "off",
 		"no-debugger": isProduction ? "warn" : "off",
@@ -44,6 +44,12 @@ module.exports = {
 		/*"one-line": [ true, "check-catch", "check-finally", "check-open-brace", "check-whitespace" ],*/
 
 		"no-trailing-spaces": "error",  // Exactly what it sounds like
+
+		"jsdoc/require-jsdoc": ["error", {"publicOnly": true}],
+		"jsdoc/require-returns": "off",
+		// These two rules can overlook some properties that should be documented, but also prevents erroneous warnings
+		"jsdoc/require-param": ["warn", {"checkDestructuredRoots": false}],
+		"jsdoc/check-param-names": ["warn", {"checkDestructured": false}],
 
 		// "@typescript-eslint/no-explicit-any": ["warn"],
 		// "@typescript-eslint/no-non-null-assertion": ["off"],

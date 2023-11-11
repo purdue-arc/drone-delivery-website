@@ -21,6 +21,10 @@ const destinationQuery = graphql(`
     }
 `);
 
+/**
+ * Display human-readable movement information. Ex: Delivering to Pete's Za, picking up from Panera.
+ * @param props.id drone id to show movement for
+ */
 export default function ReadableDestination(props: {id: number | string}) {
   const droneDestination = createSubscription(destinationQuery, {variables: {droneId: props.id}});
   const telemetry = () => droneDestination()?.me?.telemetry[0];

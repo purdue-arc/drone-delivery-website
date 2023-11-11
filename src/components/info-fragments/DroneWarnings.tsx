@@ -21,6 +21,12 @@ const warningsQuery = graphql(`
 
 const CONCERNING_LAG = 5000;  // in ms
 
+/**
+ * Show various human-readable critical information. Ex: long time w/o update, low battery, crashed
+ * @param props.id drone id to show warnings for
+ * @param props.ok Show this element if there are no warnings
+ * @param props
+ */
 export default function DroneWarnings(props: {id: number | string, ok?: JSX.Element}) {
   const droneWarnings = createSubscription(warningsQuery, {variables: {droneId: props.id}});
   const telemetry = () => droneWarnings()?.me?.telemetry[0];

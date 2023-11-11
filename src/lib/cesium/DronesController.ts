@@ -9,7 +9,6 @@ export default class DronesController {
   /**
    * Takes the value of this.selectedDrone, converts its 3d position to 2d screen space,
    * and uses that to update the popup position. If selectedDrone == undefined, sets popupPos to undefined also
-   * @private
    */
   private readonly updatePopupPos: () => void;
 
@@ -39,6 +38,7 @@ export default class DronesController {
    * @param pathActive whether or not a flight path is currently being drawn. If it is, disallow selecting drones
    * @returns tuple:
    *     1st index: the currently selected drone or undefined if none selected
+   *
    *     2nd index: true if a drone was selected/unselected, false otherwise
    */
   tryPickDrone(clickPos: Cartesian2, pathActive: boolean): [Entity | undefined, boolean] {
@@ -56,7 +56,13 @@ export default class DronesController {
     return [this.selectedDrone, false];
   }
 
-  /** Change position of a Cesium entity
+  /**
+   * Change position of a Cesium entity
+   * @param entity Cesium entity to modify
+   * @param longitude GPS longitude
+   * @param latitude GPS latitude
+   * @param height distance from WGS84 reference ellipsoid to place drone (what you get from GPS)
+   * @param heading compass direction (deg) to point in. 0 is north, increase clockwise
    * @see addDrone
    */
   setDronePos(entity: Entity, longitude: number, latitude: number, height: number, heading: number) {
@@ -75,8 +81,11 @@ export default class DronesController {
     return entity;
   }
 
-  /** Add a drone to the Cesium scene at provided location
+  /**
+   * Add a drone to the Cesium scene at provided location
    * @param id identifier of this drone in the database
+   * @param longitude GPS longitude
+   * @param latitude GPS latitude
    * @param height distance from WGS84 reference ellipsoid to place drone (what you get from GPS)
    * @param heading compass direction (deg) to point in. 0 is north, increase clockwise
    * @see https://sandcastle.cesium.com/?src=3D%20Models.html

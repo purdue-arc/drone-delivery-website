@@ -2,6 +2,10 @@ import {createSignal} from "solid-js";
 import {Line} from "solid-chartjs";
 import {Card} from "@suid/material";
 
+/**
+ * Card for detailed drone status page. Shows the specified drone's battery level over time as a line plot
+ * @param props.droneId TODO: use `const params = useParams();` and `params.id` instead
+ */
 export default function BatteryReleaseChartCard(props: {droneId: number}) {
     const [data] = createSignal({
         labels: Array.from({length: 10}, (_, i) => i + 1), //times in seconds

@@ -1,15 +1,12 @@
 import * as Cesium from "cesium";
 import {type Cartesian2, type Viewer} from "cesium";
 
-// Adapted from https://cesium.com/learn/cesiumjs-learn/cesiumjs-creating-entities/#picking
-
 /**
- * Returns the top-most entity at the provided window coordinates
- * or undefined if no entity is at that location.
- *
+ * Returns the top-most entity at the provided window coordinates or undefined if no entity is at that location.
  * @param viewer a reference to the Cesium viewer
- * @param {Cartesian2} windowPosition The window coordinates.
- * @returns {Entity} The picked entity or undefined.
+ * @param windowPosition The window coordinates.
+ * @returns The picked entity or undefined.
+ * @see https://cesium.com/learn/cesiumjs-learn/cesiumjs-creating-entities/#picking
  */
 export function pickEntity(viewer: Viewer, windowPosition: Cartesian2) {
   const picked = viewer.scene.pick(windowPosition);
