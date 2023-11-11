@@ -1,8 +1,8 @@
 import {
   ExploreOutlined as CompassIcon,
   PlaceOutlined as PlaceIcon,
-  SpeedOutlined as SpeedIcon
-} from '@suid/icons-material';
+  SpeedOutlined as SpeedIcon,
+} from "@suid/icons-material";
 import {Box, Button, Card, Grid, Stack, Typography} from "@suid/material";
 import {useParams} from "@solidjs/router";
 import {graphql} from "~/gql";
@@ -31,7 +31,7 @@ const statusQuery = graphql(`
             }
         }
     }
-`)
+`);
 // TODO: placed_at is currently unused
 
 const LoadingElem = <span>Drone has not produced enough data</span>;
@@ -58,22 +58,22 @@ export default function DroneStatusCard() {
               <img src="/drone.jpg" width="150px"  alt="Drone" />
             </Box>
             <LabeledIcon>
-              <PlaceIcon sx={{ marginRight: '0.5em' }} />
+              <PlaceIcon sx={{ marginRight: "0.5em" }} />
               ({telemetry()!.latitude}, {telemetry()!.longitude})
             </LabeledIcon>
             <LabeledIcon>
-              <CompassIcon sx={{ marginRight: '0.5em' }} />
+              <CompassIcon sx={{ marginRight: "0.5em" }} />
               {telemetry()!.heading}
             </LabeledIcon>
             <LabeledIcon>
-              <SpeedIcon sx={{ marginRight: '0.5em' }} />
+              <SpeedIcon sx={{ marginRight: "0.5em" }} />
               {telemetry()!.velocity} mph
             </LabeledIcon>
             <BatteryFragment id={params.id} />
           </Grid>
           <Grid item container direction="column" width={500}>
             <Grid item sx={{flexGrow: 99, textAlign: "center"}}>
-              <Typography sx={{ fontSize: '2em', fontWeight: 'bold' }}>Drone {params.id}</Typography>
+              <Typography sx={{ fontSize: "2em", fontWeight: "bold" }}>Drone {params.id}</Typography>
               <DroneWarnings id={params.id} ok={<Typography>✅ Operational</Typography>} />
               <ReadableDestination id={params.id} />
             </Grid>
@@ -88,5 +88,5 @@ export default function DroneStatusCard() {
       </Show>
     </Card>
   );
-};
+}
 

@@ -1,8 +1,8 @@
 import {Typography} from "@suid/material";
-import {Match, Switch} from "solid-js/web";
+
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
-import {type JSX, Show} from "solid-js";
+import {type JSX, Match, Show, Switch} from "solid-js";
 
 const warningsQuery = graphql(`
     subscription DroneWarnings($droneId: bigint!) {
@@ -17,7 +17,7 @@ const warningsQuery = graphql(`
             }
         }
     }
-`)
+`);
 
 const CONCERNING_LAG = 5000;  // in ms
 

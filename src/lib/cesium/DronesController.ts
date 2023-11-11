@@ -23,7 +23,7 @@ export default class DronesController {
       _setPopupPos(
         this.selectedDrone ?
         Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, this.selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
-        : undefined
+        : undefined,
       );
 
     viewer.camera.changed.addEventListener(() => {
@@ -67,7 +67,7 @@ export default class DronesController {
     const hpr = new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(heading - 90), 0, 0);
     const orientation = Cesium.Transforms.headingPitchRollQuaternion(
       position,
-      hpr
+      hpr,
     );
     // These errors can probably be ignored, seems to work
     entity.position = position;
@@ -94,7 +94,7 @@ export default class DronesController {
           maximumScale: 20000,
         },
       }),
-      longitude, latitude, height, heading
+      longitude, latitude, height, heading,
     );
   }
 }

@@ -19,7 +19,7 @@ const destinationQuery = graphql(`
             }
         }
     }
-`)
+`);
 
 export default function ReadableDestination(props: {id: number | string}) {
   const droneDestination = createSubscription(destinationQuery, {variables: {droneId: props.id}});

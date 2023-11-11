@@ -1,13 +1,13 @@
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, type Theme } from "@suid/material";
-import { type Accessor, children, Component, createContext, createSignal, useContext } from "solid-js";
-import FlightIcon from '@suid/icons-material/Flight';
-import MapIcon from '@suid/icons-material/Map';
-import HistoryIcon from '@suid/icons-material/History';
-import FlighstIcon from '@suid/icons-material/FlightLand';
-import LogoutIcon from '@suid/icons-material/Logout';
-import type { SvgIconProps } from "@suid/material/SvgIcon";
-import { useNavigate } from "@solidjs/router";
-import { supabase } from "~/lib/supabaseClient";
+import {Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, type Theme} from "@suid/material";
+import {type Accessor, children, Component, createContext, createSignal, useContext} from "solid-js";
+import FlightIcon from "@suid/icons-material/Flight";
+import MapIcon from "@suid/icons-material/Map";
+import HistoryIcon from "@suid/icons-material/History";
+import FlighstIcon from "@suid/icons-material/FlightLand";
+import LogoutIcon from "@suid/icons-material/Logout";
+import type {SvgIconProps} from "@suid/material/SvgIcon";
+import {useNavigate} from "@solidjs/router";
+import {supabase} from "~/lib/supabaseClient";
 
 
 const OpenContext = createContext<Accessor<boolean>>(() => false);
@@ -16,21 +16,21 @@ const OpenContext = createContext<Accessor<boolean>>(() => false);
 type CSSObject = any;  // TODO
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
-  transition: theme.transitions.create('width', {
+  transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  overflowX: 'hidden',
+  overflowX: "hidden",
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create('width', {
+  transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  overflowX: 'hidden',
+  overflowX: "hidden",
   width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
+  [theme.breakpoints.up("sm")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
 });
@@ -38,55 +38,55 @@ const closedMixin = (theme: Theme): CSSObject => ({
 // Adapted from https://mui.com/material-ui/react-drawer/#mini-variant-drawer
 // Ported to Solid thanks to https://github.com/swordev/suid/issues/249
 const drawerWidth = 240;
-const TinyDrawer = styled(Drawer, { skipProps: ['open'] })(
+const TinyDrawer = styled(Drawer, { skipProps: ["open"] })(
   ({ theme, props }) => ({
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
+    whiteSpace: "nowrap",
+    boxSizing: "border-box",
     ...(props.open && {
       ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
+      "& .MuiDrawer-paper": openedMixin(theme),
     }),
     ...(!props.open && {
       ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
+      "& .MuiDrawer-paper": closedMixin(theme),
     }),
   }),
 );
 
-function NavRow({ href, onClick, label, icon }: { label: string, icon: Component<SvgIconProps> } & ({ onClick: () => void } | { href: string })) {
+function NavRow(props: { label: string, icon: Component<SvgIconProps> } & ({ onClick: () => void } | { href: string })) {
   const isOpen = useContext(OpenContext);
-  const safeIcon = children(() => icon({}));
+  const safeIcon = children(() => props.icon({}));
   const navigate = useNavigate();
 
   return (
-    <ListItem disablePadding sx={{ display: 'block' }}>
+    <ListItem disablePadding sx={{ display: "block" }}>
       <ListItemButton
         sx={{
           minHeight: 48,
-          justifyContent: isOpen() ? 'initial' : 'center',
+          justifyContent: isOpen() ? "initial" : "center",
           px: 2.5,
         }}
-        onClick={onClick ?? navigate.bind(this, href)}
+        onClick={props.onClick ?? navigate.bind(this, props.href)}
       >
         <ListItemIcon
           sx={{
             minWidth: 0,
-            mr: isOpen() ? 3 : 'auto',
-            justifyContent: 'center',
+            mr: isOpen() ? 3 : "auto",
+            justifyContent: "center",
           }}
         >
           {safeIcon()}
         </ListItemIcon>
-        <ListItemText primary={label} sx={{ opacity: isOpen() ? 1 : 0 }} />
+        <ListItemText primary={props.label} sx={{ opacity: isOpen() ? 1 : 0 }} />
       </ListItemButton>
     </ListItem>
   );
 }
 
 async function signOut() {
-  const { error } = await supabase.auth.signOut()
+  const { error } = await supabase.auth.signOut();
 }
 
 

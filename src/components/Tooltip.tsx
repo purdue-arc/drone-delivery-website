@@ -1,4 +1,4 @@
-import "./Tooltip.css"
+import "./Tooltip.css";
 import {type JSX} from "solid-js";
 
 export default function Tooltip(props: { children: JSX.Element, x: number, y: number }) {

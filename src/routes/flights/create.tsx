@@ -1,5 +1,4 @@
-import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Button} from "@suid/material";
-import {For} from "solid-js";
+import {Box, Button, Typography} from "@suid/material";
 
 function createData(
   name: string,
@@ -12,18 +11,18 @@ function createData(
 }
 
 const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
+  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
+  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
+  createData("Eclair", 262, 16.0, 24, 6.0),
+  createData("Cupcake", 305, 3.7, 67, 4.3),
+  createData("Gingerbread", 356, 16.0, 49, 3.9),
 ];
 
 
 export default function Flights() {
   return (
     <Box padding={2}>
-        
+
     <Typography variant="h3">Create a New Flight</Typography>
 
     {/* create a form */}
@@ -62,10 +61,10 @@ export default function Flights() {
             {/* i am using soidjs and material ui. i want to make a form component to college n number of waypoints, each waypoint has a lat and a longh */}
 
             {/* for loop */}
-            
 
 
-            
+
+
 
         </form>
         <Button variant="contained" color="primary" href="/flights/create" sx={{marginLeft: "auto"}}>
@@ -73,5 +72,5 @@ export default function Flights() {
         </Button>
 
     </Box>
-  )
+  );
 }

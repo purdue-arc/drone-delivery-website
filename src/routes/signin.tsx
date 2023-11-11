@@ -1,45 +1,44 @@
-import {createSignal} from 'solid-js'
-import {supabase} from '~/lib/supabaseClient'
-import {Avatar, Box, Button, TextField, Typography} from '@suid/material'
+import {createSignal} from "solid-js";
+import {supabase} from "~/lib/supabaseClient";
+import {Avatar, Box, Button, TextField, Typography} from "@suid/material";
 import {type SignInWithPasswordCredentials} from "@supabase/supabase-js";
 
 export default function Auth() {
-  const [loading, setLoading] = createSignal(false)
+  const [loading, setLoading] = createSignal(false);
 
-  const handleLogin = async (e: SubmitEvent) => {
+  const handleLogin = async(e: SubmitEvent) => {
     e.preventDefault();
     // TODO: use material UI's validation UI
     if (!(e.target as HTMLFormElement).reportValidity())
       return;
-    const formData = new FormData(e.target as HTMLFormElement)
+    const formData = new FormData(e.target as HTMLFormElement);
 
     try {
-      setLoading(true)
+      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.get("email") ?? "",
         password: formData.get("password") ?? "",
-      } as SignInWithPasswordCredentials)
-      console.log(data)
+      } as SignInWithPasswordCredentials);
+      console.log(data);
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message)
+        alert(error.message);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
       <Box
         sx={{
           marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-        </Avatar>
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }} />
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
@@ -74,5 +73,5 @@ export default function Auth() {
           </Button>
         </Box>
       </Box>
-  )
+  );
 }

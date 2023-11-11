@@ -1,8 +1,7 @@
-
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@suid/material";
-import { For } from "solid-js";
-import { graphql } from "~/gql";
-import { createSubscription } from '@merged/solid-apollo'
+import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@suid/material";
+import {For} from "solid-js";
+import {graphql} from "~/gql";
+import {createSubscription} from "@merged/solid-apollo";
 
 
 const SUBSCRIPTION = graphql(`
@@ -23,7 +22,7 @@ export default function Drones() {
   return (
     <Box padding={2}>
       <Typography variant="h3">All Drones</Typography>
-      <TableContainer sx={{ borderRadius: 2, border: 1, borderColor: 'rgba(224.4, 224.4, 224.4, 1)' }} component={Paper}>
+      <TableContainer sx={{ borderRadius: 2, border: 1, borderColor: "rgba(224.4, 224.4, 224.4, 1)" }} component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -34,7 +33,7 @@ export default function Drones() {
           </TableHead>
           <TableBody>
             <For each={data()?.drone_telemetry || []}>{(row) => (
-              <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <For each={Object.values(row)}>
                   {(cell) => (
                     // toString() needed to turn boolean into string

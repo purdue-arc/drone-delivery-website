@@ -1,5 +1,5 @@
-import * as Cesium from 'cesium';
-import {CameraEventType, Cartesian2, Cartesian3, type Entity, type ScreenSpaceEventHandler} from 'cesium';
+import * as Cesium from "cesium";
+import {CameraEventType, Cartesian2, Cartesian3, type Entity, type ScreenSpaceEventHandler} from "cesium";
 import {createEffect, createSignal, Index, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
@@ -9,7 +9,7 @@ import DronesController from "~/lib/cesium/DronesController";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
 
-const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"]
+const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
 const dronesPosQuery = graphql(`
     subscription DronesPos {
@@ -21,7 +21,7 @@ const dronesPosQuery = graphql(`
             altitude
         }
     }
-`)
+`);
 
 export default function Home() {
   // TODO: can all of these signals be moved inside onMount? is there React-like restriction?
@@ -78,7 +78,7 @@ export default function Home() {
     }
 
     viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
-      Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+      Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK,
     );
 
     // set simulation time
@@ -87,7 +87,7 @@ export default function Home() {
     const stop = Cesium.JulianDate.addSeconds(
       start,
       3600,
-      new Cesium.JulianDate()
+      new Cesium.JulianDate(),
     );
     viewer.clock.startTime = start.clone();
     viewer.clock.stopTime = stop.clone();
@@ -108,13 +108,13 @@ export default function Home() {
         const radians = Cesium.Math.toRadians(i);
         const time = Cesium.JulianDate.addSeconds(
           start,
-          i ,
-          new Cesium.JulianDate()
+          i,
+          new Cesium.JulianDate(),
         );
         const position = Cesium.Cartesian3.fromDegrees(
           lon + radius * 1.5 * Math.cos(radians),
           lat + radius * Math.sin(radians),
-          Cesium.Math.nextRandomNumber() * 500 + 1750
+          Cesium.Math.nextRandomNumber() * 500 + 1750,
         );
         property.addSample(time, position);
 
@@ -135,8 +135,8 @@ export default function Home() {
       const property = new Cesium.SampledPositionProperty();
       const time = Cesium.JulianDate.addSeconds(
         start,
-        360 ,
-        new Cesium.JulianDate()
+        360,
+        new Cesium.JulianDate(),
       );
       const startPosition = Cesium.Cartesian3.fromDegrees(startLon, startLat, 1000);
       const endPosition = Cesium.Cartesian3.fromDegrees(endLon, endLat, 1000);
@@ -174,7 +174,7 @@ export default function Home() {
           polygon: {
             hierarchy: positionData,
             material: new Cesium.ColorMaterialProperty(
-              Cesium.Color.WHITE.withAlpha(0.7)
+              Cesium.Color.WHITE.withAlpha(0.7),
             ),
           },
         });
@@ -187,7 +187,7 @@ export default function Home() {
     let floatingPoint: Cesium.Entity | undefined;
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-    handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
+    handler.setInputAction(function(event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position, activeShapePoints.length > 0);
       if (!isDrawingPath())
         setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "NaN"));
@@ -204,7 +204,7 @@ export default function Home() {
           floatingPoint = createPoint(earthPosition);
 
           activeShapePoints.push(earthPosition);
-          const dynamicPositions = new Cesium.CallbackProperty(function () {
+          const dynamicPositions = new Cesium.CallbackProperty(function() {
             if (drawingMode === "polygon") {
               return new Cesium.PolygonHierarchy(activeShapePoints);
             }
@@ -218,7 +218,7 @@ export default function Home() {
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     // Mouse move handler to change the position of the floating point
-    handler.setInputAction(function (event) {
+    handler.setInputAction(function(event) {
       if (Cesium.defined(floatingPoint)) {
         if (!altPressed) {
           const newPosition = viewer.scene.pickPosition(event.endPosition);
@@ -243,14 +243,14 @@ export default function Home() {
     }
 
     // End the shape
-    handler.setInputAction(function () {
+    handler.setInputAction(function() {
       setIsDrawingPath(false);
       setSelectedDroneId(NaN);
       let pos = Cesium.Cartographic.fromCartesian(activeShapePoints[0]);
       let pos1 = [pos.longitude / Math.PI * 180, pos.latitude / Math.PI * 180];
       let pos2 = Cesium.Cartographic.fromCartesian(activeShapePoints[1]);
       let pos3 = [pos2.longitude / Math.PI * 180, pos2.latitude / Math.PI * 180];
-      const position = computeLineFlight(pos1[0], pos1[1], pos3[0],pos3[1]);
+      const position = computeLineFlight(pos1[0], pos1[1], pos3[0], pos3[1]);
       console.log(start);
       console.log(stop);
       const entity1 = viewer.entities.add({
@@ -287,7 +287,7 @@ export default function Home() {
       viewer.trackedEntity = entity1;
       // hide the path after journey
       const duration = Cesium.JulianDate.secondsDifference(stop, start);
-      console.log(duration)
+      console.log(duration);
       setTimeout(() => {
         viewer.entities.remove(entity1);
       }, duration * 1000);
@@ -297,7 +297,7 @@ export default function Home() {
     const options = [
       {
         text: "Draw Lines",
-        onselect: function () {
+        onselect: function() {
           if (!Cesium.Entity.supportsPolylinesOnTerrain(viewer.scene)) {
             window.alert("This browser does not support polylines on terrain.");
           }
@@ -308,7 +308,7 @@ export default function Home() {
       },
       {
         text: "Draw Polygons",
-        onselect: function () {
+        onselect: function() {
           terminateShape();
           drawingMode = "polygon";
         },
@@ -320,14 +320,14 @@ export default function Home() {
     const PURDUE_LOCATION = Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0);
     viewer.camera.lookAt(
       PURDUE_LOCATION,
-      new Cartesian3(0, -500, 1600)
+      new Cartesian3(0, -500, 1600),
     );
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
 
     var tileset = viewer.scene.primitives.add(
       new Cesium.Cesium3DTileset({
         url: Cesium.IonResource.fromAssetId(1608724),
-      })
+      }),
     );
   });
 
@@ -349,8 +349,8 @@ export default function Home() {
 
   return (
     <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
-      <div id="drawingOptions"></div>
-      <div id="cesiumContainer"></div>
+      <div id="drawingOptions" />
+      <div id="cesiumContainer" />
       <Show when={popupPos()?.x && popupPos()?.y && !isNaN(selectedDroneId())}>
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
           <DroneTooltipContents id={selectedDroneId()} onStartDrawingPath={startDrawingPath} />

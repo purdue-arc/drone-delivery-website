@@ -1,6 +1,6 @@
 // @refresh reload
 import {createResource, onMount, Suspense} from "solid-js";
-import {Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title,} from "solid-start";
+import {Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title} from "solid-start";
 import "./root.css";
 import SideNav from "~/components/SideNav";
 import {Box, useTheme} from "@suid/material";
@@ -14,14 +14,14 @@ export default function Root() {
   const theme = useTheme();
 
   const [session, {mutate: setSession}] = createResource<AuthSession | null>(
-    () => supabase.auth.getSession().then(({ data: { session } }) => session)
+    () => supabase.auth.getSession().then(({ data: { session } }) => session),
   );
 
   onMount(() => {
     supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  })
+      setSession(session);
+    });
+  });
 
   return (
     <Html lang="en">
