@@ -40,7 +40,7 @@ If the previous options don't work for you, just install Node.JS on your system 
 
 ### 2. Adding Access Tokens
 
-CesiumJS requires that you have an access token to be able to access geospatial elements through their service Cesium Ion such as satelite imagery. We don't want to leak that token so that other people can use our , so we store it in an environment variable in a `.env.local` file that the [Vite reads](https://vitejs.dev/guide/env-and-mode.html) from and that is not tracked by git (see `.gitignore`). Copy `.env.local.sample` to `.env.local` by running 
+CesiumJS requires that you have an access token to be able to access geospatial elements through their service Cesium Ion such as satelite imagery. We don't want to leak that token so that other people can use our free credits, so we store it in an environment variable in a `.env.local` file that the [Vite reads](https://vitejs.dev/guide/env-and-mode.html) from and that is not tracked by git (see `.gitignore`). Copy `.env.local.sample` to `.env.local` by running 
 
 ```
 cp .env.local.sample .env.local
