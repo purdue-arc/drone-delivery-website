@@ -1,12 +1,12 @@
 import type {CodegenConfig} from '@graphql-codegen/cli'
-import {GRAPHQL_ENDPOINT} from "./src/lib/gqlClient";
+import {nhost} from "./src/lib/nHost";
 import {loadEnv} from "vite";
 
 // Documentation: https://the-guild.dev/graphql/codegen/docs/config-reference/codegen-config
 
 const config: CodegenConfig = {
   schema: [{
-    ["https://" + GRAPHQL_ENDPOINT]: {
+    [nhost.graphql.httpUrl]: {
       headers: {
         "x-hasura-admin-secret": loadEnv("production", process.cwd())["VITE_HASURA_ADMIN_SECRET"] as string,
       },

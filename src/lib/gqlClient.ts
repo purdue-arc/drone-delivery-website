@@ -7,24 +7,24 @@ import {getMainDefinition} from "@apollo/client/utilities";
 import {ApolloClient} from "@merged/solid-apollo";
 import {isServer} from "solid-js/web";
 import ws from "ws";
+import {nhost} from "~/lib/nHost";
 
 
 // Adapted from https://hasura.io/docs/latest/subscriptions/integrations/apollo-subscriptions/
 // Docs: https://www.apollographql.com/docs/react/data/subscriptions/
 // Solid adapter: https://github.com/merged-js/solid-apollo
 
-export const GRAPHQL_ENDPOINT = "dd-hasura.purduearc.com/v1/graphql";
 const headers = {
   "x-hasura-admin-secret": import.meta.env["VITE_HASURA_ADMIN_SECRET"] as string,
 };
 
 const httpLink = new HttpLink({
-  uri: "https://" + GRAPHQL_ENDPOINT,
+  uri: nhost.graphql.httpUrl,
   headers,
 });
 
 const wsLink = new GraphQLWsLink(createClient({
-  url: "wss://" + GRAPHQL_ENDPOINT,
+  url: nhost.graphql.wsUrl,
   connectionParams: {
     headers,
   },
