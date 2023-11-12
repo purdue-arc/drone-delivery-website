@@ -63,8 +63,9 @@ By default, `npm run build` will generate a Node app that you can run with `npm 
     - [Material icons](https://mui.com/material-ui/material-icons/)
     - [Styling](https://mui.com/system/properties/) & [sx prop](https://mui.com/system/getting-started/the-sx-prop/)
 4. [Cesium](https://sandcastle.cesium.com/): 3D map rendering engine
-5. Supabase
+5. [Nhost](https://nhost.io/)
    - Postgres
-6. Hasura 
+   - Auth
+   - Hasura
    - GraphQL
 7. Vite: Build tool
