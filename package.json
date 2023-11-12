@@ -41,11 +41,11 @@
   "dependencies": {
     "@apollo/client": "^3.8.5",
     "@merged/solid-apollo": "^1.7.1",
+    "@nhost/nhost-js": "^2.2.18",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
     "@suid/icons-material": "^0.6.10",
     "@suid/material": "^0.15.0",
-    "@supabase/supabase-js": "^2.38.4",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
     "graphql": "^16.8.1",

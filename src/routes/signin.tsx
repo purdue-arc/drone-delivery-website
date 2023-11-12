@@ -1,7 +1,6 @@
 import {createSignal} from "solid-js";
-import {supabase} from "~/lib/supabaseClient";
 import {Avatar, Box, Button, TextField, Typography} from "@suid/material";
-import {type SignInWithPasswordCredentials} from "@supabase/supabase-js";
+import { nhost } from "~/lib/nHost";
 
 /** Login page (username and password) */
 export default function Auth() {
@@ -16,11 +15,11 @@ export default function Auth() {
 
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.get("email") ?? "",
-        password: formData.get("password") ?? "",
-      } as SignInWithPasswordCredentials);
-      console.log(data);
+      const response = await nhost.auth.signIn({
+        email: formData.get("email") as string || "",
+        password: formData.get("password") as string || "",
+      });
+      console.log(response);
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message);

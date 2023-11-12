@@ -6,20 +6,19 @@ import SideNav from "~/components/SideNav";
 import {Box, useTheme} from "@suid/material";
 import {ApolloProvider} from "@merged/solid-apollo";
 import gqlClient from "~/lib/gqlClient";
-import {AuthSession} from "@supabase/supabase-js";
 import Auth from "./routes/signin";
-import {supabase} from "./lib/supabaseClient";
+import { nhost } from "~/lib/nHost";
 
 /** Render the frame common to all routes (navigation, graphql provider, auth) */
 export default function Root() {
   const theme = useTheme();
 
-  const [session, {mutate: setSession}] = createResource<AuthSession | null>(
-    () => supabase.auth.getSession().then(({ data: { session } }) => session),
+  const [session, {mutate: setSession}] = createResource(
+    () => nhost.auth.getSession(),
   );
 
   onMount(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
+    nhost.auth.onAuthStateChanged((_event, session) => {
       setSession(session);
     });
   });
