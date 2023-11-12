@@ -11,11 +11,11 @@ It uses [CesiumJS](https://cesium.com/learn/cesiumjs-learn/) as a geospatial ren
 
 ## Developing
 
-### 1. Getting started
+### 1. Choose the environment
 
 #### GitHub Codespace
 
-This is the easiest method as it involves installing nothing on your computer. Make sure you have the GitHub student developer account on your account. This will give you free access to GitHub Codespaces. Next, go to https://github.com/purdue-arc/drone-delivery-website and click the `Code` button and then `Codespaces` and launch the repository. It should start automatically.
+This is the easiest method as it involves installing nothing on your computer. Make sure you have the GitHub student developer account on your account. This will give you free access to GitHub Codespaces. Next, go to https://github.com/purdue-arc/drone-delivery-website and click the `Code` button and then `Codespaces` and launch the repository.
 
 #### Docker container locally
 
@@ -35,10 +35,10 @@ You should connect to the repository inside the container so that you are using 
 
 #### Locally
 
-If the previous options don't work for you, just install Node.JS on your system and run `npm run dev` to start the app.
+If the previous options don't work for you, just install Node.JS on your system.
 
 
-### 2. Adding Access Tokens
+### 2. Add Access Tokens
 
 CesiumJS requires that you have an access token to be able to access geospatial elements through their service Cesium Ion such as satelite imagery. We don't want to leak that token so that other people can use our free credits, so we store it in an environment variable in a `.env.local` file that the [Vite reads](https://vitejs.dev/guide/env-and-mode.html) from and that is not tracked by git (see `.gitignore`). Copy `.env.local.sample` to `.env.local` by running 
 
@@ -47,6 +47,10 @@ cp .env.local.sample .env.local
 ``` 
 
 and then fill in the access token variable (no quotes surrounding the token).
+
+### 3. Run the app
+
+Run `npm install` to get the latest packages and `npm run dev` to start the app.
 
 ## Building
 
