@@ -23,9 +23,8 @@ const dronesPosQuery = graphql(`
     }
 `);
 
-/** Home/index page containing the map and ability to create new flights*/
+/** Home/index page containing the map and ability to create new flights */
 export default function Home() {
-  // TODO: can all of these signals be moved inside onMount? is there React-like restriction?
   const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
   // NaN represents no drone is selected. Using instead of -1 because it makes logical mistakes more evident

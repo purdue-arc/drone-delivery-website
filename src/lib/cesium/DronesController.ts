@@ -93,6 +93,7 @@ export default class DronesController {
   addDrone(id: number, longitude: number, latitude: number, height: number, heading: number) {
     const url = "drone.glb";
     return this.setDronePos(
+      // TODO: ignore scene lighting, hard to see at night
       this.viewer.entities.add({
         name: String(id),
         model: {
