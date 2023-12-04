@@ -76,6 +76,7 @@ export default class PathController {
     this.property.addSample(this.elapsedTime, position);
 
     //Also create a point for each sample we generate.
+    // TODO: allow clicking through handles & line when placing points, otherwise can cause weird stacking
     this.viewer.entities.add({
       position: position,
       point: {

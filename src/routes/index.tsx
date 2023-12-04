@@ -135,28 +135,14 @@ export default function Home() {
       return point;
     }
 
-    let drawingMode = "line";
     function drawShape(positionData) {
-      let shape;
-      if (drawingMode === "line") {
-        shape = viewer.entities.add({
-          polyline: {
-            positions: positionData,
-            clampToGround: true,
-            width: 3,
-          },
-        });
-      } else if (drawingMode === "polygon") {
-        shape = viewer.entities.add({
-          polygon: {
-            hierarchy: positionData,
-            material: new Cesium.ColorMaterialProperty(
-              Cesium.Color.WHITE.withAlpha(0.7),
-            ),
-          },
-        });
-      }
-      return shape;
+      return viewer.entities.add({
+        polyline: {
+          positions: positionData,
+          clampToGround: true,
+          width: 3,
+        },
+      });
     }
 
     let activeShapePoints = [] as Cartesian3[];
@@ -173,25 +159,22 @@ export default function Home() {
       }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
       // we get the correct point when mousing over terrain.
-      let earthPosition = viewer.scene.pickPosition(event.position);
+      const earthPosition = viewer.scene.pickPosition(event.position);
       // `earthPosition` will be undefined if our mouse is not over the globe.
       if (Cesium.defined(earthPosition)) {
-        earthPosition = addHeight(earthPosition, 100);
         if (activeShapePoints.length === 0) {
           // Create the first floating point
           floatingPoint = createPoint(earthPosition);
 
           activeShapePoints.push(earthPosition);
           const dynamicPositions = new Cesium.CallbackProperty(function() {
-            if (drawingMode === "polygon") {
-              return new Cesium.PolygonHierarchy(activeShapePoints);
-            }
             return activeShapePoints;
           }, false);
           activeShape = drawShape(dynamicPositions);
         }
+        // Create another point that's permanent
         createPoint(earthPosition);
-        pathController.extendPath(earthPosition);
+        pathController.extendPath(addHeight(earthPosition, 100));
         activeShapePoints.push(earthPosition);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -273,27 +256,6 @@ export default function Home() {
       }, duration * 1000);
       terminateShape();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-
-    const options = [
-      {
-        text: "Draw Lines",
-        onselect: function() {
-          if (!Cesium.Entity.supportsPolylinesOnTerrain(viewer.scene)) {
-            window.alert("This browser does not support polylines on terrain.");
-          }
-
-          terminateShape();
-          drawingMode = "line";
-        },
-      },
-      {
-        text: "Draw Polygons",
-        onselect: function() {
-          terminateShape();
-          drawingMode = "polygon";
-        },
-      },
-    ];
 
 
     // Zoom in to Purdue
