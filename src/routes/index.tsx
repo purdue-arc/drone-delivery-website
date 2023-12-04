@@ -100,36 +100,6 @@ export default function Home() {
       return `LMAO ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     };
 
-    function computeCirclularFlight(lon: number, lat: number, radius: number) {
-
-      const property = new Cesium.SampledPositionProperty();
-      for (let i = 0; i <= 360; i += 45) {
-        const radians = Cesium.Math.toRadians(i);
-        const time = Cesium.JulianDate.addSeconds(
-          start,
-          i,
-          new Cesium.JulianDate(),
-        );
-        const position = Cesium.Cartesian3.fromDegrees(
-          lon + radius * 1.5 * Math.cos(radians),
-          lat + radius * Math.sin(radians),
-          Cesium.Math.nextRandomNumber() * 500 + 1750,
-        );
-        property.addSample(time, position);
-
-        //Also create a point for each sample we generate.
-        viewer.entities.add({
-          position: position,
-          point: {
-            pixelSize: 18,
-            color: Cesium.Color.RED,
-            outlineColor: Cesium.Color.RED,
-            outlineWidth: 3,
-          },
-        });
-      }
-      return property;
-    }
     function computeLineFlight(startLon: number, startLat: number, endLon: number, endLat: number) {
       const property = new Cesium.SampledPositionProperty();
       const time = Cesium.JulianDate.addSeconds(
@@ -145,6 +115,10 @@ export default function Home() {
     }
 
 
+    /**
+     * Creates a tiny red dot which follows your cursor when creating a new flight path
+     * @param worldPosition initial position to place dot
+     */
     function createPoint(worldPosition: Cartesian3) {
       const point = viewer.entities.add({
         position: worldPosition,
@@ -157,6 +131,7 @@ export default function Home() {
       setPoints((points) => [...points, worldPosition.toString()]);
       return point;
     }
+
     let drawingMode = "line";
     function drawShape(positionData) {
       let shape;
@@ -225,6 +200,7 @@ export default function Home() {
         if (!altPressed) {
           const newPosition = viewer.scene.pickPosition(event.endPosition);
           if (Cesium.defined(newPosition)) {
+            pathController.previewPath(addHeight(newPosition, 100));
             floatingPoint.position.setValue(newPosition);
             activeShapePoints.pop();
             activeShapePoints.push(newPosition);

@@ -10,6 +10,15 @@ export default class PathController {
   /** Last keyframe position added, used to compute next keyframe time in conjunction with `droneSpeed` assuming straight line */
   private lastPosition: Cartesian3 | undefined;
 
+  /** 1 second after `elapsedTime`, used for previewing */
+  private get nextSecond() {
+    return Cesium.JulianDate.addSeconds(
+      this.elapsedTime,
+      1,
+      new Cesium.JulianDate(),
+    );
+  }
+
   /**
    * Constructs a new PathController that manages previewing flight paths
    * @param viewer a reference to the Cesium viewer
@@ -56,6 +65,7 @@ export default class PathController {
    * @param position new position to visit
    */
   extendPath(position: Cartesian3) {
+    this.property.removeSample(this.nextSecond);
     const deltaTime = Cesium.Cartesian3.distance(this.lastPosition ?? position, position) / this.droneSpeed;
     this.lastPosition = position;
     this.elapsedTime = Cesium.JulianDate.addSeconds(
@@ -77,7 +87,18 @@ export default class PathController {
     });
   }
 
-  /** Presently does nothing TODO: remove and rename beginPath to something more applicable */
+  /**
+   * Remove current preview node, then add a new keyframe to path, one second from `elapsedTime` so it can be easily found.
+   * Also doesn't render adjustment handle (circle)
+   * @param position new position to preview
+   */
+  previewPath(position: Cartesian3) {
+    this.property.removeSample(this.nextSecond);
+    this.property.addSample(this.nextSecond, position);
+  }
+
+  /** Removes preview path node */
   closePath() {
+    this.property.removeSample(this.nextSecond);
   }
 }
