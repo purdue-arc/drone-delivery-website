@@ -8,6 +8,8 @@ import DroneTooltipContents from "~/components/DroneTooltipContents";
 import DronesController from "~/lib/cesium/DronesController";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
+import PathController from "~/lib/cesium/PathController";
+import {addHeight} from "~/lib/cesium/addHeight";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
@@ -54,7 +56,9 @@ export default function Home() {
     });
 
     const dronesController = new DronesController(viewer, setPopupPos);
+    const pathController = new PathController(viewer, 10);
 
+    // Update or add all drone positions
     createEffect(() => {
       console.log(dronesPos());
       for (const drone of dronesPos()?.drone_telemetry ?? []) {
@@ -89,11 +93,6 @@ export default function Home() {
       3600,
       new Cesium.JulianDate(),
     );
-    viewer.clock.startTime = start.clone();
-    viewer.clock.stopTime = stop.clone();
-    viewer.clock.currentTime = start.clone();
-    viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP; //Loop at the end
-    viewer.timeline.zoomTo(start, stop);
 
     viewer.animation.viewModel.timeFormatter = function(julianDate, viewModel) {
       // TODO: format the timeline in local time
@@ -196,10 +195,12 @@ export default function Home() {
       }
       // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
       // we get the correct point when mousing over terrain.
-      const earthPosition = viewer.scene.pickPosition(event.position);
+      let earthPosition = viewer.scene.pickPosition(event.position);
       // `earthPosition` will be undefined if our mouse is not over the globe.
       if (Cesium.defined(earthPosition)) {
+        earthPosition = addHeight(earthPosition, 100);
         if (activeShapePoints.length === 0) {
+          pathController.beginPath();
           // Create the first floating point
           floatingPoint = createPoint(earthPosition);
 
@@ -213,6 +214,7 @@ export default function Home() {
           activeShape = drawShape(dynamicPositions);
         }
         createPoint(earthPosition);
+        pathController.extendPath(earthPosition);
         activeShapePoints.push(earthPosition);
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -233,6 +235,7 @@ export default function Home() {
 
     // Redraw the shape so it's not dynamic and remove the dynamic shape.
     function terminateShape() {
+      pathController.closePath();
       activeShapePoints.pop();
       drawShape(activeShapePoints);
       viewer.entities.remove(floatingPoint);
@@ -284,7 +287,6 @@ export default function Home() {
           width: 10,
         },
       });
-      viewer.trackedEntity = entity1;
       // hide the path after journey
       const duration = Cesium.JulianDate.secondsDifference(stop, start);
       console.log(duration);
