@@ -33,16 +33,19 @@ export default function Home() {
   const [selectedDroneId, setSelectedDroneId] = createSignal(NaN);
   const [isDrawingPath, setIsDrawingPath] = createSignal(false);
 
+  const drones: Record<number, Entity> = {};
+  let pathController: PathController;
+
   function startDrawingPath() {
     setIsDrawingPath(true);
     setPopupPos(undefined);
+    pathController.beginPath();
+    pathController.extendPath(drones[selectedDroneId()].position!.getValue(Cesium.JulianDate.now()) as Cartesian3);
   }
 
   onMount(() => {
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
-
     const dronesPos = createSubscription(dronesPosQuery);
-    const drones: Record<number, Entity> = {};
     const viewer = new Cesium.Viewer("cesiumContainer", {
       selectionIndicator: false,
       infoBox: false,
@@ -56,7 +59,7 @@ export default function Home() {
     });
 
     const dronesController = new DronesController(viewer, setPopupPos);
-    const pathController = new PathController(viewer, 10);
+    pathController = new PathController(viewer, 10);
 
     // Update or add all drone positions
     createEffect(() => {
@@ -175,7 +178,6 @@ export default function Home() {
       if (Cesium.defined(earthPosition)) {
         earthPosition = addHeight(earthPosition, 100);
         if (activeShapePoints.length === 0) {
-          pathController.beginPath();
           // Create the first floating point
           floatingPoint = createPoint(earthPosition);
 
