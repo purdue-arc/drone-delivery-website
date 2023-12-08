@@ -157,9 +157,11 @@ export default function Home() {
 
     // End the shape
     handler.setInputAction(function() {
+      if (!isDrawingPath()) return;
       setIsDrawingPath(false);
       setSelectedDroneId(NaN);
       terminateShape();
+      pathController.simulateLocal();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
 

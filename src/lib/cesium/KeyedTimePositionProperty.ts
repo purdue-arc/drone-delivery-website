@@ -29,9 +29,18 @@ export default class KeyedTimePositionProperty {
   private readonly times: JulianDate[] = this.pathProp._property._times;
   /** Reference to packed array of sample `Cartesian3`s inside `SampledPositionProperty` */
   private readonly positions: number[] = this.pathProp._property._values;
+  /** The time at which the simulation starts (read-only, use setter) */
+  private _startTime = new JulianDate();
   /** Unpacked representation of `positions`, used by `CallbackProperty` */
   private getPositions() {
     return Cesium.Cartesian3.unpackArray(this.positions);
+  }
+
+  /** Change the start time (first sample) and all following samples */
+  set startTime(newTime: JulianDate) {
+    if (newTime.equals(this._startTime)) return;
+    this._startTime = newTime;
+    this.upsertSample({idx: 0});
   }
 
   /**
@@ -40,6 +49,9 @@ export default class KeyedTimePositionProperty {
    * @param speed m/s, used to compute time between points
    */
   constructor(public readonly speed: number) {
+    this.pathProp.backwardExtrapolationType =
+    this.pathProp.forwardExtrapolationType =
+      Cesium.ExtrapolationType.HOLD;
   }
 
   /**
@@ -64,11 +76,11 @@ export default class KeyedTimePositionProperty {
 
     // Default params
     idx = idx ?? this.idIndexMap[id as number] ?? this.times.length;
-    newPosition = newPosition ?? Cartesian3.unpack(this.positions, (idx - 1) * 3);
+    newPosition = newPosition ?? Cartesian3.unpack(this.positions, idx * 3);
 
     // Compute new time with constant velocity
     const prevPos = this.positions[(idx - 1) * 3] != undefined ? Cartesian3.unpack(this.positions, (idx - 1) * 3) : newPosition;
-    const prevTime = this.times[idx - 1] ?? new JulianDate();
+    const prevTime = this.times[idx - 1] ?? this._startTime;
     const deltaTime = Cartesian3.distance(prevPos, newPosition) / this.speed;
     const elapsedTime = JulianDate.addSeconds(
       prevTime,

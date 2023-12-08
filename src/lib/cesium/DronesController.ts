@@ -3,6 +3,14 @@ import * as Cesium from "cesium";
 import {type Setter} from "solid-js";
 import {pickEntity} from "~/lib/cesium/pickEntity";
 
+export const droneModel = {
+  uri: "drone.glb",
+  // This config is responsible for keeping the drone at constant size while zooming out
+  // I think this is good b/c it makes finding/clicking drones easier
+  minimumPixelSize: 64,
+  maximumScale: 20000,
+};
+
 export default class DronesController {
   private selectedDrone: Entity | undefined;
 
@@ -91,18 +99,11 @@ export default class DronesController {
    * @see https://sandcastle.cesium.com/?src=3D%20Models.html
    */
   addDrone(id: number, longitude: number, latitude: number, height: number, heading: number) {
-    const url = "drone.glb";
     return this.setDronePos(
       // TODO: ignore scene lighting, hard to see at night
       this.viewer.entities.add({
         name: String(id),
-        model: {
-          uri: url,
-          // This config is responsible for keeping the drone at constant size while zooming out
-          // I think this is good b/c it makes finding/clicking drones easier
-          minimumPixelSize: 64,
-          maximumScale: 20000,
-        },
+        model: droneModel,
       }),
       longitude, latitude, height, heading,
     );

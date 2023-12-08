@@ -1,12 +1,17 @@
 import type {Cartesian3} from "cesium";
 import * as Cesium from "cesium";
 import KeyedTimePositionProperty from "~/lib/cesium/KeyedTimePositionProperty";
+import {droneModel} from "~/lib/cesium/DronesController";
 
 export default class PathController {
   /** Position interpolator: computes position between time and position keyframes */
   private property: KeyedTimePositionProperty;
   /** Id of the currently active preview node */
   private previewId = -1;
+  /** Cesium entity corresponding to the yellow path in the sky */
+  private skyPathEntity: Cesium.Entity | undefined;
+  /** javascript interval id when simulating on database */
+  private simulationInterval: number | undefined;
 
   /**
    * Constructs a new PathController that manages previewing flight paths
@@ -21,7 +26,7 @@ export default class PathController {
   beginPath() {
     this.property = new KeyedTimePositionProperty(this.droneSpeed);
     this.previewId = -1;
-    this.viewer.entities.add({
+    this.skyPathEntity = this.viewer.entities.add({
       //Set the entity availability to the same interval as the simulation time.
       availability: new Cesium.TimeIntervalCollection([
         new Cesium.TimeInterval({
@@ -47,6 +52,11 @@ export default class PathController {
         width: 10,
       },
     });
+    // TODO: test if it's possible/necessary to round corners. This attempt veered too far off course
+    // this.property.pathProp.setInterpolationOptions({
+    //   interpolationDegree: 2,
+    //   interpolationAlgorithm: Cesium.HermitePolynomialApproximation,
+    // });
 
     // Add the white path on the ground
     this.viewer.entities.add({
@@ -98,5 +108,37 @@ export default class PathController {
   closePath() {
     this.property.removeSample(this.previewId);
     this.property.setIsConstant(false);
+  }
+
+  /** Simulate the created drone path by animating a drone along its path (does not write to database) */
+  simulateLocal() {
+    if (!this.skyPathEntity)
+      throw "No path to simulate";
+    this.property.startTime = Cesium.JulianDate.now();
+    this.skyPathEntity.model = new Cesium.ModelGraphics(droneModel);
+    this.skyPathEntity.orientation = new Cesium.VelocityOrientationProperty(this.property.pathProp);
+  }
+
+  /** Simulate the created drone path by sending fake telemetry events to the database */
+  simulateDatabase() {
+    if (!this.skyPathEntity)
+      throw "No path to simulate";
+    this.property.startTime = Cesium.JulianDate.now();
+    const simulationFrequency = 500;
+    this.simulationInterval = window.setInterval(this.simulateDatabaseTick, simulationFrequency);
+  }
+
+  /** Call every time interval when simulating on database*/
+  private simulateDatabaseTick() {
+    // TODO
+  }
+
+  /** Stop simulation & clean up objects */
+  endSimulation() {
+    if (!this.skyPathEntity)
+      throw "No path to simulate";
+    this.skyPathEntity.model = undefined;
+    this.skyPathEntity.orientation = undefined;
+    window.clearInterval(this.simulationInterval);
   }
 }
