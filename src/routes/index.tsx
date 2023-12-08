@@ -29,9 +29,8 @@ const dronesPosQuery = graphql(`
 export default function Home() {
   const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
-  // TODO: figure out how to attach docstrings to destructured properties
-  /** NaN represents no drone is selected. Using instead of -1 because it makes logical mistakes more evident */
-  const [selectedDroneId, setSelectedDroneId] = createSignal(NaN);
+  // TODO: attach docstrings to destructured properties https://github.com/microsoft/TypeScript/issues/32392
+  const [selectedDroneId, setSelectedDroneId] = createSignal<number>();
   const [isDrawingPath, setIsDrawingPath] = createSignal(false);
 
   let viewer: Cesium.Viewer;
@@ -60,7 +59,7 @@ export default function Home() {
     setIsDrawingPath(true);
     setPopupPos(undefined);
     pathController.beginPath();
-    const dronePos = drones[selectedDroneId()].position!.getValue(Cesium.JulianDate.now()) as Cartesian3;
+    const dronePos = drones[selectedDroneId() as number].position!.getValue(Cesium.JulianDate.now()) as Cartesian3;
     // Create the first floating point
     floatingPoint = createPoint(dronePos);
     pathController.extendPath(dronePos);
@@ -120,7 +119,7 @@ export default function Home() {
     handler.setInputAction(function(event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position, isDrawingPath());
       if (!isDrawingPath())
-        setSelectedDroneId(Number.parseInt(selectedDrone?.name ?? "NaN"));
+        setSelectedDroneId(selectedDrone?.properties?.getValue(new Cesium.JulianDate())?.id);
       if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
         return;
       }
@@ -159,7 +158,7 @@ export default function Home() {
     handler.setInputAction(function() {
       if (!isDrawingPath()) return;
       setIsDrawingPath(false);
-      setSelectedDroneId(NaN);
+      setSelectedDroneId(undefined);
       terminateShape();
       pathController.simulateLocal();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
@@ -200,7 +199,7 @@ export default function Home() {
     <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <div id="drawingOptions" />
       <div id="cesiumContainer" />
-      <Show when={popupPos()?.x && popupPos()?.y && !isNaN(selectedDroneId())}>
+      <Show when={popupPos()?.x && popupPos()?.y && selectedDroneId() != undefined}>
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
           <DroneTooltipContents id={selectedDroneId()} onStartDrawingPath={startDrawingPath} />
         </Tooltip>

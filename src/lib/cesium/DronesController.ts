@@ -1,9 +1,9 @@
-import type {Cartesian2, Cartesian3, Entity, Viewer} from "cesium";
+import type {Cartesian2, Cartesian3, Entity, ModelGraphics, Viewer} from "cesium";
 import * as Cesium from "cesium";
 import {type Setter} from "solid-js";
 import {pickEntity} from "~/lib/cesium/pickEntity";
 
-export const droneModel = {
+export const droneModel: ModelGraphics.ConstructorOptions = {
   uri: "drone.glb",
   // This config is responsible for keeping the drone at constant size while zooming out
   // I think this is good b/c it makes finding/clicking drones easier
@@ -102,9 +102,9 @@ export default class DronesController {
     return this.setDronePos(
       // TODO: ignore scene lighting, hard to see at night
       this.viewer.entities.add({
-        name: String(id),
         model: droneModel,
-      }),
+        properties: {id},
+      } satisfies Entity.ConstructorOptions),
       longitude, latitude, height, heading,
     );
   }
