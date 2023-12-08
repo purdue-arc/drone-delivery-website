@@ -75,7 +75,6 @@ export default class PathController {
   extendPath(position: Cartesian3) {
     this.previewPath(position);
     this.previewId = -1;
-    console.log(this.property.pathProp._property);
 
     //Also create a point for each sample we generate.
     // TODO: allow clicking through handles & line when placing points, otherwise can cause weird stacking
@@ -96,7 +95,6 @@ export default class PathController {
    * @param position new position to preview
    */
   previewPath(position: Cartesian3) {
-    console.log("previewing", this.previewId);
     if (this.previewId >= 0) {
       console.assert(this.property.editSample(this.previewId, position));
     } else {  // previewId == -1
