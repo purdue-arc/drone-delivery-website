@@ -1,6 +1,6 @@
 import type {Cartesian2, Cartesian3, Entity, ModelGraphics, Viewer} from "cesium";
 import * as Cesium from "cesium";
-import {type Setter} from "solid-js";
+import type {Accessor, Setter} from "solid-js";
 import {pickEntity} from "~/lib/cesium/pickEntity";
 
 export const droneModel: ModelGraphics.ConstructorOptions = {
@@ -24,8 +24,9 @@ export default class DronesController {
    * Constructs a new Controller of all drones. Manages clicking on drones, tracking drone popups, and adding drones
    * @param viewer a reference to the Cesium viewer
    * @param _setPopupPos function to call when the camera moves with the drone's new screen position (used for sticky ui)
+   * @param isDrawingPath Function that returns whether a path is currently being drawn (probably a Solid signal). If true, disallow selecting drones
    */
-  constructor(private viewer: Viewer, _setPopupPos: Setter<Cartesian2 | undefined>) {
+  constructor(private viewer: Viewer, _setPopupPos: Setter<Cartesian2 | undefined>, private isDrawingPath: Accessor<boolean>) {
     this.updatePopupPos = () =>
       _setPopupPos(
         this.selectedDrone ?
@@ -34,7 +35,7 @@ export default class DronesController {
       );
 
     viewer.camera.changed.addEventListener(() => {
-      if (!this.selectedDrone) return;
+      if (!this.selectedDrone || this.isDrawingPath()) return;
       // https://cesium.com/learn/cesiumjs/ref-doc/SceneTransforms.html
       this.updatePopupPos();
     });
@@ -43,15 +44,14 @@ export default class DronesController {
   /**
    * Determines if click event is on top of drone and updates state accordingly
    * @param clickPos the position the click event occurred at
-   * @param pathActive whether or not a flight path is currently being drawn. If it is, disallow selecting drones
    * @returns tuple:
    *     1st index: the currently selected drone or undefined if none selected
    *
    *     2nd index: true if a drone was selected/unselected, false otherwise
    */
-  tryPickDrone(clickPos: Cartesian2, pathActive: boolean): [Entity | undefined, boolean] {
+  tryPickDrone(clickPos: Cartesian2): [Entity | undefined, boolean] {
     const pickedEntity = pickEntity(this.viewer, clickPos);
-    if (pickedEntity && !pathActive) {  // Select drone only if no active path
+    if (pickedEntity && !this.isDrawingPath()) {  // Select drone only if no active path
       this.selectedDrone = pickedEntity;
       this.updatePopupPos();
       return [this.selectedDrone, true];

@@ -79,7 +79,7 @@ export default function Home() {
       animation: true,
     });
 
-    const dronesController = new DronesController(viewer, setPopupPos);
+    const dronesController = new DronesController(viewer, setPopupPos, isDrawingPath);
     pathController = new PathController(viewer, 10);
 
     // Update or add all drone positions
@@ -117,7 +117,7 @@ export default function Home() {
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function(event: ScreenSpaceEventHandler.PositionedEvent) {
-      const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position, isDrawingPath());
+      const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position);
       if (!isDrawingPath())
         setSelectedDroneId(selectedDrone?.properties?.getValue(new Cesium.JulianDate())?.id);
       if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
