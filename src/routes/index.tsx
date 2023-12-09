@@ -123,9 +123,9 @@ export default function Home() {
       if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
         return;
       }
-      // We use `viewer.scene.pickPosition` here instead of `viewer.camera.pickEllipsoid` so that
-      // we get the correct point when mousing over terrain.
-      const earthPosition = viewer.scene.pickPosition(event.position);
+      // Use `floatingPoint.position` instead of `viewer.scene.pickPosition` b/c `pickPosition` adds extra height if mouse overlapping path entity
+      // Note: clicking on top of a drone or photogrammetry terrain will add extra height, but I view this as ok
+      const earthPosition = floatingPoint?.position?.getValue(new Cesium.JulianDate()) as Cartesian3;
       // `earthPosition` will be undefined if our mouse is not over the globe.
       if (Cesium.defined(earthPosition)) {
         // Create another point that's permanent
