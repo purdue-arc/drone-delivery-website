@@ -1,7 +1,8 @@
-import type {Cartesian2, Cartesian3, Entity, ModelGraphics, Viewer} from "cesium";
+import type {Cartesian2, Entity, ModelGraphics, Viewer} from "cesium";
 import * as Cesium from "cesium";
 import type {Accessor, Setter} from "solid-js";
 import {pickEntity} from "~/lib/cesium/pickEntity";
+import {Drone} from "~/lib/cesium/Drone";
 
 export const droneModel: ModelGraphics.ConstructorOptions = {
   uri: "drone.glb",
@@ -12,7 +13,7 @@ export const droneModel: ModelGraphics.ConstructorOptions = {
 };
 
 export default class DronesController {
-  private selectedDrone: Entity | undefined;
+  private selectedDrone: Drone | undefined;
 
   /**
    * Takes the value of this.selectedDrone, converts its 3d position to 2d screen space,
@@ -30,7 +31,7 @@ export default class DronesController {
     this.updatePopupPos = () =>
       _setPopupPos(
         this.selectedDrone ?
-        Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, this.selectedDrone.position!.getValue(viewer.scene.lastRenderTime) as Cartesian3)
+        Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, this.selectedDrone.position)
         : undefined,
       );
 
@@ -49,10 +50,10 @@ export default class DronesController {
    *
    *     2nd index: true if a drone was selected/unselected, false otherwise
    */
-  tryPickDrone(clickPos: Cartesian2): [Entity | undefined, boolean] {
+  tryPickDrone(clickPos: Cartesian2): [Drone | undefined, boolean] {
     const pickedEntity = pickEntity(this.viewer, clickPos);
     if (pickedEntity && !this.isDrawingPath()) {  // Select drone only if no active path
-      this.selectedDrone = pickedEntity;
+      this.selectedDrone = new Drone(pickedEntity);
       this.updatePopupPos();
       return [this.selectedDrone, true];
     }
@@ -65,31 +66,6 @@ export default class DronesController {
   }
 
   /**
-   * Change position of a Cesium entity
-   * @param entity Cesium entity to modify
-   * @param longitude GPS longitude
-   * @param latitude GPS latitude
-   * @param height distance from WGS84 reference ellipsoid to place drone (what you get from GPS)
-   * @param heading compass direction (deg) to point in. 0 is north, increase clockwise
-   * @see addDrone
-   */
-  setDronePos(entity: Entity, longitude: number, latitude: number, height: number, heading: number) {
-    // Cesium uses WGS84 reference ellipsoid (https://epsg.org/ellipsoid_7030/WGS-84.html), same as GPS (https://community.cesium.com/t/get-heighy-value/23064/2)
-    // See https://www.unavco.org/education/resources/tutorials-and-handouts/tutorials/geoid-gps-receivers.html for more info on how GPS works
-    // Avg height of Purdue is 190m. Cesium renders terrain at the correct height. Check specific height: https://www.daftlogic.com/projects-find-elevation-on-map.htm
-    const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, height);
-    const hpr = new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(heading - 90), 0, 0);
-    const orientation = Cesium.Transforms.headingPitchRollQuaternion(
-      position,
-      hpr,
-    );
-    // These errors can probably be ignored, seems to work
-    entity.position = position;
-    entity.orientation = orientation;
-    return entity;
-  }
-
-  /**
    * Add a drone to the Cesium scene at provided location
    * @param id identifier of this drone in the database
    * @param longitude GPS longitude
@@ -99,13 +75,13 @@ export default class DronesController {
    * @see https://sandcastle.cesium.com/?src=3D%20Models.html
    */
   addDrone(id: number, longitude: number, latitude: number, height: number, heading: number) {
-    return this.setDronePos(
-      // TODO: ignore scene lighting, hard to see at night
-      this.viewer.entities.add({
+    // TODO: ignore scene lighting, hard to see at night
+    return new Drone(this.viewer.entities.add({
         model: droneModel,
         properties: {id},
-      } satisfies Entity.ConstructorOptions),
-      longitude, latitude, height, heading,
-    );
+      } satisfies Entity.ConstructorOptions))
+      .setPos(
+        longitude, latitude, height, heading,
+      );
   }
 }

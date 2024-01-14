@@ -1,6 +1,6 @@
 import * as Cesium from "cesium";
-import {CameraEventType, Cartesian2, Cartesian3, type Entity, type ScreenSpaceEventHandler} from "cesium";
-import {createEffect, createSignal, Index, onMount, Show} from "solid-js";
+import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from "cesium";
+import {createEffect, createSignal, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import Tooltip from "~/components/Tooltip";
@@ -10,6 +10,9 @@ import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
 import PathController from "~/lib/cesium/PathController";
 import {addHeight} from "~/lib/cesium/addHeight";
+import {Stack} from "@suid/material";
+import FlightEditor from "~/lib/FlightEditor";
+import {Drone} from "~/lib/cesium/Drone";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
@@ -32,9 +35,17 @@ export default function Home() {
   // TODO: attach docstrings to destructured properties https://github.com/microsoft/TypeScript/issues/32392
   const [selectedDroneId, setSelectedDroneId] = createSignal<number>();
   const [isDrawingPath, setIsDrawingPath] = createSignal(false);
+  const [flightEditorIsShowing, setFlightEditorIsShowing] = createSignal(false);
+
+  createEffect(() => {
+    if (isDrawingPath())
+      setFlightEditorIsShowing(true);
+    else if (selectedDroneId() == undefined)
+      setFlightEditorIsShowing(false);
+  });
 
   let viewer: Cesium.Viewer;
-  const drones: Record<number, Entity> = {};
+  const drones: Record<number, Drone> = {};
   let pathController: PathController;
   let floatingPoint: Cesium.Entity | undefined;
 
@@ -58,8 +69,12 @@ export default function Home() {
   function startDrawingPath() {
     setIsDrawingPath(true);
     setPopupPos(undefined);
+    // TODO: load from db if exists
+    pathController = new PathController(viewer, 10);
     pathController.beginPath();
-    const dronePos = drones[selectedDroneId() as number].position!.getValue(Cesium.JulianDate.now()) as Cartesian3;
+    const selectedDrone = drones[selectedDroneId()!];
+    selectedDrone.setProp("path", pathController);
+    const dronePos = selectedDrone.position;
     // Create the first floating point
     floatingPoint = createPoint(dronePos);
     pathController.extendPath(dronePos);
@@ -80,14 +95,13 @@ export default function Home() {
     });
 
     const dronesController = new DronesController(viewer, setPopupPos, isDrawingPath);
-    pathController = new PathController(viewer, 10);
 
     // Update or add all drone positions
     createEffect(() => {
       console.log(dronesPos());
       for (const drone of dronesPos()?.drone_telemetry ?? []) {
         if (drone.id in drones) {
-          dronesController.setDronePos(drones[drone.id], drone.longitude, drone.latitude, drone.altitude, drone.heading);
+          drones[drone.id].setPos(drone.longitude, drone.latitude, drone.altitude, drone.heading);
         } else {
           drones[drone.id] = dronesController.addDrone(drone.id, drone.longitude, drone.latitude, drone.altitude, drone.heading);
         }
@@ -119,7 +133,7 @@ export default function Home() {
     handler.setInputAction(function(event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position);
       if (!isDrawingPath())
-        setSelectedDroneId(selectedDrone?.properties?.getValue(new Cesium.JulianDate())?.id);
+        setSelectedDroneId(selectedDrone?.getProps()?.id);
       if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
         return;
       }
@@ -158,9 +172,7 @@ export default function Home() {
     handler.setInputAction(function() {
       if (!isDrawingPath()) return;
       setIsDrawingPath(false);
-      setSelectedDroneId(undefined);
       terminateShape();
-      pathController.simulateLocal();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
 
@@ -198,13 +210,17 @@ export default function Home() {
   return (
     <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
       <div id="drawingOptions" />
-      <div id="cesiumContainer" />
-      <Show when={popupPos()?.x && popupPos()?.y && selectedDroneId() != undefined}>
+      <Stack direction="row">
+        <div id="cesiumContainer" />
+        <Show when={flightEditorIsShowing()}>
+          <FlightEditor points={points()} pathController={drones[selectedDroneId()!].getProps().path!} />
+        </Show>
+      </Stack>
+      <Show when={popupPos()?.x && popupPos()?.y && selectedDroneId() != undefined && !flightEditorIsShowing()}>
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
-          <DroneTooltipContents id={selectedDroneId()} onStartDrawingPath={startDrawingPath} />
+          <DroneTooltipContents id={selectedDroneId()!} onStartDrawingPath={startDrawingPath} />
         </Tooltip>
       </Show>
-      <Index each={points()}>{(point, i) => <li>{point()}</li>}</Index>
     </main>
   );
 }
