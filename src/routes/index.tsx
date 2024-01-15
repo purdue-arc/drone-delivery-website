@@ -1,6 +1,6 @@
 import * as Cesium from "cesium";
 import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from "cesium";
-import {createEffect, createSignal, onMount, Show} from "solid-js";
+import {createEffect, createSignal, onCleanup, onMount, Show} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import Tooltip from "~/components/Tooltip";
@@ -67,18 +67,15 @@ export default function Home() {
   }
 
   function startDrawingPath() {
+    setIsDrawingPath(true);
+    setPopupPos(undefined);
+    pathController.beginPath(selectedDroneId()!);
     // TODO: load from db if exists
-    pathController = new PathController(viewer, 10);
-    pathController.beginPath();
     const selectedDrone = drones[selectedDroneId()!];
-    selectedDrone.setProp("path", pathController);
     const dronePos = selectedDrone.position;
     // Create the first floating point
     floatingPoint = createPoint(dronePos);
     pathController.extendPath(dronePos);
-    // Update state (must happen last so sidebar isn't shown while drone prop `path` is undefined)
-    setIsDrawingPath(true);
-    setPopupPos(undefined);
   }
 
   onMount(() => {
@@ -96,6 +93,7 @@ export default function Home() {
     });
 
     const dronesController = new DronesController(viewer, setPopupPos, isDrawingPath);
+    pathController = new PathController(viewer, 10);
 
     // Update or add all drone positions
     createEffect(() => {
@@ -192,6 +190,10 @@ export default function Home() {
     );
   });
 
+  onCleanup(() => {
+    pathController.clearPath();
+  })
+
   let altPressed = false;
 
   function handleKeyDown(event: KeyboardEvent) {
@@ -214,7 +216,7 @@ export default function Home() {
       <Stack direction="row">
         <div id="cesiumContainer" />
         <Show when={flightEditorIsShowing()}>
-          <FlightEditor points={points()} pathController={drones[selectedDroneId()!].getProps().path!} />
+          <FlightEditor points={points()} pathController={pathController!} />
         </Show>
       </Stack>
       <Show when={popupPos()?.x && popupPos()?.y && selectedDroneId() != undefined && !flightEditorIsShowing()}>

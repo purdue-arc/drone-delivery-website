@@ -54,7 +54,7 @@ export default class KeyedTimePositionProperty {
   constructor(public readonly speed: number) {
     this.pathProp.backwardExtrapolationType =
     this.pathProp.forwardExtrapolationType =
-      Cesium.ExtrapolationType.HOLD;
+      Cesium.ExtrapolationType.NONE;
   }
 
   /**
