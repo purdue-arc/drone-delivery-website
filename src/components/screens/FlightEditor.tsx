@@ -1,5 +1,7 @@
-import {Box, Button, Typography} from "@suid/material";
-import {Index} from "solid-js";
+import {Box, Button, MenuItem, MenuList, Paper, Popper, Stack, Typography} from "@suid/material";
+import ClickAwayListener from "~/components/generic/ClickAwayListener";
+import ArrowDropUpIcon from '@suid/icons-material/ArrowDropUp';
+import {createSignal, For, Index} from "solid-js";
 import type PathController from "~/lib/cesium/PathController";
 
 /**
@@ -31,6 +33,15 @@ const rows = [
 
 /** TODO */
 export default function FlightEditor(props: { points: string[], pathController: PathController }) {
+  const [isOpen, setIsOpen] = createSignal(false);
+  const [selectedIndex, setSelectedIndex] = createSignal(0);
+  let anchorRef: HTMLButtonElement | undefined;
+
+  const options = [
+    {name: 'Local', onClick: () => props.pathController.simulateLocal()},
+    {name: 'Database', onClick: () => props.pathController.simulateDatabase()}
+  ];
+
   return (
     <Box padding={2}>
       <Typography variant="h3">Flight</Typography>
@@ -74,15 +85,34 @@ export default function FlightEditor(props: { points: string[], pathController: 
 
       <Index each={props.points}>{(point, i) => <li>{point()}</li>}</Index>
 
-      <Button variant="contained" color="primary" href="/flights/create" sx={{marginLeft: "auto"}}>
-        Submit Flight
-      </Button>
-      <Button variant="outlined" color="primary" onClick={() => props.pathController.simulateLocal()} sx={{marginLeft: "auto"}}>
-        Simulate Local
-      </Button>
-      <Button variant="outlined" color="primary" onClick={() => props.pathController.simulateDatabase()} sx={{marginLeft: "auto"}}>
-        Simulate Database
-      </Button>
+      <Stack spacing={2} direction="row" justifyContent="right">
+        <Button variant="outlined" ref={anchorRef} onClick={() => setIsOpen(prev => !prev)}>
+          Simulate <ArrowDropUpIcon />
+        </Button>
+        <Button variant="contained" color="primary" href="/flights/create" sx={{marginLeft: "auto"}}>
+          Submit Flight
+        </Button>
+      </Stack>
+
+      {/* Dropdown for simulate button */}
+      <Popper
+        open={isOpen()}
+        anchorEl={anchorRef}
+      >
+        <Paper>
+          <ClickAwayListener onClickAway={() => setIsOpen(false)}>
+            <MenuList>
+              <For each={options}>{({name, onClick}) =>
+                <MenuItem
+                  onClick={onClick}
+                >
+                  {name}
+                </MenuItem>
+              }</For>
+            </MenuList>
+          </ClickAwayListener>
+        </Paper>
+      </Popper>
 
     </Box>
   );

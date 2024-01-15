@@ -50,7 +50,7 @@ export class Drone {
    */
   getProps() {
     console.log(this.entity?.properties?.id);
-    return this.entity.properties!.getValue(new Cesium.JulianDate());
+    return this.entity.properties!.getValue(new Cesium.JulianDate()) as DroneProperties;
   }
 
   setProp<T extends keyof DroneProperties>(key: T, value: DroneProperties[T]) {

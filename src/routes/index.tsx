@@ -67,8 +67,6 @@ export default function Home() {
   }
 
   function startDrawingPath() {
-    setIsDrawingPath(true);
-    setPopupPos(undefined);
     // TODO: load from db if exists
     pathController = new PathController(viewer, 10);
     pathController.beginPath();
@@ -78,6 +76,9 @@ export default function Home() {
     // Create the first floating point
     floatingPoint = createPoint(dronePos);
     pathController.extendPath(dronePos);
+    // Update state (must happen last so sidebar isn't shown while drone prop `path` is undefined)
+    setIsDrawingPath(true);
+    setPopupPos(undefined);
   }
 
   onMount(() => {
