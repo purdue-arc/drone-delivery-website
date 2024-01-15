@@ -11,7 +11,7 @@ import {createSubscription} from "@merged/solid-apollo";
 import PathController from "~/lib/cesium/PathController";
 import {addHeight} from "~/lib/cesium/addHeight";
 import {Stack} from "@suid/material";
-import FlightEditor from "~/lib/FlightEditor";
+import FlightEditor from "~/components/screens/FlightEditor";
 import {Drone} from "~/lib/cesium/Drone";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
