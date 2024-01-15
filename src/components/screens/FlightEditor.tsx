@@ -1,6 +1,8 @@
-import {Box, Button, MenuItem, MenuList, Paper, Popper, Stack, Typography} from "@suid/material";
+import {Box, Button, IconButton, MenuItem, MenuList, Paper, Popper, Stack, Typography} from "@suid/material";
 import ClickAwayListener from "~/components/generic/ClickAwayListener";
 import ArrowDropUpIcon from '@suid/icons-material/ArrowDropUp';
+import NoteAddIcon from '@suid/icons-material/NoteAdd';
+import SearchIcon from '@suid/icons-material/Search';
 import {createSignal, For, Index} from "solid-js";
 import type PathController from "~/lib/cesium/PathController";
 
@@ -44,42 +46,23 @@ export default function FlightEditor(props: { points: string[], pathController: 
 
   return (
     <Box padding={2}>
-      <Typography variant="h3">Flight</Typography>
+      <Typography variant="h3">Edit Flight</Typography>
+      <Typography>
+        Controls:<br />
+        Left drag: move waypoint parallel to ground<br />
+        Alt + Left drag: move waypoint vertically
+      </Typography>
 
-      {/* flight name */}
-      <label>
-        Order Id:
-        <input type="number" name="orderId"/>
-      </label>
-      <br/>
-
-      {/* flight start latitude */}
-      <label>
-        Flight Start Latitude:
-        <input type="text" name="flightStartLatitude"/>
-      </label>
-      <br/>
-
-      {/* flight end latitude */}
-      <label>
-        Flight End Latitude:
-        <input type="text" name="flightEndLatitude"/>
-      </label>
-      <br/>
-
-      {/* flight start longitude */}
-      <label>
-        Flight Start Longitude:
-        <input type="text" name="flightStartLongitude"/>
-      </label>
-      <br/>
-
-      {/* flight end longitude */}
-      <label>
-        Flight End Longitude:
-        <input type="text" name="flightEndLongitude"/>
-      </label>
-      <br/>
+      <fieldset>
+        <legend>Order Id</legend>
+        (none selected)
+        <IconButton onClick={() => console.log("new")} title="Create new order">
+          <NoteAddIcon />
+        </IconButton>
+        <IconButton onClick={() => console.log("select")} title="Select existing order">
+          <SearchIcon />
+        </IconButton>
+      </fieldset>
 
       <Typography variant="h4">Waypoints</Typography>
 
