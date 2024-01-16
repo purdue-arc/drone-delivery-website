@@ -52,23 +52,6 @@ export default function Home() {
   let pathController: PathController;
   let floatingPoint: Cesium.Entity | undefined;
 
-  /**
-   * Creates a tiny red dot which follows your cursor when creating a new flight path
-   * @param worldPosition initial position to place dot
-   */
-  function createPoint(worldPosition: Cartesian3) {
-    const point = viewer.entities.add({
-      position: worldPosition,
-      point: {
-        color: Cesium.Color.RED,
-        pixelSize: 5,
-        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-      },
-    });
-    setPoints((points) => [...points, worldPosition.toString()]);
-    return point;
-  }
-
   function startDrawingPath() {
     setIsDrawingPath(true);
     setPopupPos(undefined);
@@ -77,8 +60,7 @@ export default function Home() {
     pathController.beginPath(selectedDrone);
     const dronePos = selectedDrone.position;
     // Create the first floating point
-    floatingPoint = createPoint(dronePos);
-    pathController.extendPath(dronePos);
+    floatingPoint = pathController.extendPath(dronePos);
   }
 
   onMount(() => {
@@ -144,8 +126,7 @@ export default function Home() {
       const earthPosition = floatingPoint?.position?.getValue(new Cesium.JulianDate()) as Cartesian3;
       // `earthPosition` will be undefined if our mouse is not over the globe.
       if (Cesium.defined(earthPosition)) {
-        // Create another point that's permanent
-        createPoint(earthPosition);
+        // Create another point that's permanent (inside extendPath)
         pathController.extendPath(addHeight(earthPosition, 100));
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);

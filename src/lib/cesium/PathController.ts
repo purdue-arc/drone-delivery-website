@@ -28,6 +28,8 @@ export default class PathController {
   private groundPathEntity: Cesium.Entity | undefined;
   /** Yellow circles in the sky allowing for adjusting sky path */
   private skyWaypointEntities: Cesium.Entity[] = [];
+  /** Red dots on the ground visualizing where your cursor is */
+  private groundWaypointEntities: Cesium.Entity[] = [];
   /** javascript interval id when simulating on database */
   private simulationInterval: number | undefined;
   /** Because of this, class must be instanced at top-level component. Only need 1 instance */
@@ -53,6 +55,7 @@ export default class PathController {
     this.previewId = -1;
     this.drone = drone;
     this.skyWaypointEntities = [];
+    this.groundWaypointEntities = [];
     this.skyPathEntity = this.viewer.entities.add({
       //Set the entity availability to the same interval as the simulation time.
       availability: foreverInterval,
@@ -87,8 +90,10 @@ export default class PathController {
   }
 
   /**
-   * Add a new keyframe to the flight path. Computes time by assuming constant velocity linear flight path based on `droneSpeed`
+   * Add a new keyframe to the flight path. Computes time by assuming constant velocity linear flight path based on `droneSpeed`.
+   * Also Creates a tiny red dot which follows your cursor when creating a new flight path
    * @param position new position to visit
+   * @return Entity for the red point on the ground
    */
   extendPath(position: Cartesian3) {
     this.previewPath(position);
@@ -97,7 +102,7 @@ export default class PathController {
     //Also create a point for each sample we generate.
     // TODO: allow clicking through handles & line when placing points, otherwise can cause weird stacking
     this.skyWaypointEntities.push(this.viewer.entities.add({
-      position: position,
+      position,
       point: {
         pixelSize: 8,
         color: Cesium.Color.TRANSPARENT,
@@ -105,6 +110,18 @@ export default class PathController {
         outlineWidth: 3,
       },
     }));
+
+    const groundPoint = this.viewer.entities.add({
+      position,
+      point: {
+        color: Cesium.Color.RED,
+        pixelSize: 5,
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      },
+    });
+    this.groundWaypointEntities.push(groundPoint);
+
+    return groundPoint;
   }
 
   /**
@@ -134,6 +151,7 @@ export default class PathController {
     this.viewer.entities.remove(this.skyPathEntity);
     this.viewer.entities.remove(this.groundPathEntity!);  // Defined together with skyPathEntity
     this.skyWaypointEntities.forEach(e => this.viewer.entities.remove(e));
+    this.groundWaypointEntities.forEach(e => this.viewer.entities.remove(e));
   }
 
   /** Simulate the created drone path by animating a drone along its path (does not write to database) */
