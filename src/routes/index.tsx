@@ -3,8 +3,8 @@ import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} f
 import {createEffect, createSignal, onCleanup, onMount, Show, untrack} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
-import Tooltip from "~/components/Tooltip";
-import DroneTooltipContents from "~/components/DroneTooltipContents";
+import Tooltip from "~/components/tooltips/Tooltip";
+import DroneTooltipContents from "~/components/tooltips/DroneTooltipContents";
 import DronesController from "~/lib/cesium/DronesController";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
