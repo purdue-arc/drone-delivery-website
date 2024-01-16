@@ -1,5 +1,5 @@
+import type {Cartesian3, Clock, Entity} from "cesium";
 import * as Cesium from "cesium";
-import {Cartesian3, type Entity} from "cesium";
 import PathController from "~/lib/cesium/PathController";
 
 
@@ -12,12 +12,14 @@ export interface DroneProperties {
 export class Drone {
   /**
    * Wrapper around Cesium.Entity for Drones
+   * @param entity Drone Entity to wrap
+   * @param clock Clock instance for Viewer which this Drone belongs. Used for getting position
    */
-  constructor(private entity: Entity) {
+  constructor(private readonly entity: Entity, private readonly clock: Clock) {
   }
 
   get position() {
-    return this.entity.position!.getValue(Cesium.JulianDate.now()) as Cartesian3
+    return this.entity.position!.getValue(this.clock.currentTime) as Cartesian3
   }
 
   /**

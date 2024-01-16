@@ -53,7 +53,7 @@ export default class DronesController {
   tryPickDrone(clickPos: Cartesian2): [Drone | undefined, boolean] {
     const pickedEntity = pickEntity(this.viewer, clickPos);
     if (pickedEntity && !this.isDrawingPath()) {  // Select drone only if no active path
-      this.selectedDrone = new Drone(pickedEntity);
+      this.selectedDrone = new Drone(pickedEntity, this.viewer.clock);
       this.updatePopupPos();
       return [this.selectedDrone, true];
     }
@@ -79,7 +79,7 @@ export default class DronesController {
     return new Drone(this.viewer.entities.add({
         model: droneModel,
         properties: {id},
-      } satisfies Entity.ConstructorOptions))
+      } satisfies Entity.ConstructorOptions), this.viewer.clock)
       .setPos(
         longitude, latitude, height, heading,
       );
