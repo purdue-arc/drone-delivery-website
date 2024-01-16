@@ -32,7 +32,7 @@ export default function ReadableDestination(props: {id: number | string}) {
 
   return (
     <Show when={telemetry() && flight()}>
-      <Show when={telemetry()!.stage_of_flight === "in_flight"} fallback={<Typography>{telemetry()!.stage_of_flight}</Typography>}>
+      <Show when={flight()!.order} fallback={<Typography>{telemetry()!.stage_of_flight}</Typography>}>
         {/* TODO: intelligently report states such as: Delivering to ___/picking up from _____/parking at */}
         <Typography>{telemetry()!.has_package ? "Delivering" : "Picking up"} from {flight()!.order!.vendor!.name}</Typography>
       </Show>

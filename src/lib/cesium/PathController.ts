@@ -11,7 +11,7 @@ import {Accessor, createSignal, Setter} from "solid-js";
 
 const simulateTelemetryMutation = graphql(`
     mutation SimulateTelemetry($drone_id: bigint, $altitude: float8, $latitude: float8, $longitude: float8, $heading: float8, $timestamp: bigint) {
-        insert_drone_telemetry_one(object: {altitude: $altitude, drone_id: $drone_id, battery: "50", has_package: false, heading: $heading, latitude: $latitude, longitude: $longitude, stage_of_flight: "in_flight", timestamp: $timestamp}) {
+        insert_drone_telemetry_one(object: {altitude: $altitude, drone_id: $drone_id, battery: "50", has_package: false, heading: $heading, latitude: $latitude, longitude: $longitude, stage_of_flight: "repositioning", timestamp: $timestamp}) {
             id
         }
     }
