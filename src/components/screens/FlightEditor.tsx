@@ -5,6 +5,7 @@ import NoteAddIcon from '@suid/icons-material/NoteAdd';
 import SearchIcon from '@suid/icons-material/Search';
 import {createSignal, For, Index} from "solid-js";
 import type PathController from "~/lib/cesium/PathController";
+import {type Cartographic} from "cesium";
 
 /**
  * TODO: delete
@@ -34,7 +35,7 @@ const rows = [
 
 
 /** TODO */
-export default function FlightEditor(props: { points: string[], pathController: PathController }) {
+export default function FlightEditor(props: { points: Cartographic[], pathController: PathController }) {
   const [isOpen, setIsOpen] = createSignal(false);
   const [selectedIndex, setSelectedIndex] = createSignal(0);
   let anchorRef: HTMLButtonElement | undefined;
@@ -67,7 +68,7 @@ export default function FlightEditor(props: { points: string[], pathController: 
 
       <Typography variant="h4">Waypoints</Typography>
 
-      <Index each={props.points}>{(point, i) => <li>{point()}</li>}</Index>
+      <Index each={props.points}>{(point, i) => <li>{point().toString()}</li>}</Index>
 
       <Stack spacing={2} direction="row" justifyContent="right">
         <Button variant="outlined" ref={anchorRef} onClick={() => setIsOpen(prev => !prev)}>

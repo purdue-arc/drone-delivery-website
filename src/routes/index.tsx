@@ -31,7 +31,6 @@ const dronesPosQuery = graphql(`
 
 /** Home/index page containing the map and ability to create new flights */
 export default function Home() {
-  const [points, setPoints] = createSignal([] as string[]);
   const [popupPos, setPopupPos] = createSignal<Cartesian2>();
   // TODO: attach docstrings to destructured properties https://github.com/microsoft/TypeScript/issues/32392
   const [selectedDroneId, setSelectedDroneId] = createSignal<number>();
@@ -200,7 +199,7 @@ export default function Home() {
       <Stack direction="row">
         <div id="cesiumContainer" />
         <Show when={flightEditorIsShowing()}>
-          <FlightEditor points={points()} pathController={pathController!} />
+          <FlightEditor points={pathController!.waypoints()} pathController={pathController!} />
         </Show>
       </Stack>
       <Show when={popupPos()?.x && popupPos()?.y && selectedDroneId() != undefined && !flightEditorIsShowing()}>

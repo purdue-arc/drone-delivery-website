@@ -1,11 +1,12 @@
-import type {Cartesian3} from "cesium";
 import * as Cesium from "cesium";
+import {type Cartesian3, Cartographic} from "cesium";
 import KeyedTimePositionProperty from "~/lib/cesium/KeyedTimePositionProperty";
 import {droneModel} from "~/lib/cesium/DronesController";
 import {graphql} from "~/gql";
 import {createMutation} from "@merged/solid-apollo";
 import {foreverInterval} from "~/lib/cesium/intervals";
 import type {Drone} from "~/lib/cesium/Drone";
+import {Accessor, createSignal, Setter} from "solid-js";
 
 
 const simulateTelemetryMutation = graphql(`
@@ -28,6 +29,10 @@ export default class PathController {
   private groundPathEntity: Cesium.Entity | undefined;
   /** Yellow circles in the sky allowing for adjusting sky path */
   private skyWaypointEntities: Cesium.Entity[] = [];
+  /** Setter for reactive sky waypoints in longitude/latitude form */
+  private readonly setWaypoints: Setter<Cartographic[]>;
+  /** Reactive sky waypoints in longitude/latitude form */
+  public readonly waypoints: Accessor<Cartographic[]>;
   /** Red dots on the ground visualizing where your cursor is */
   private groundWaypointEntities: Cesium.Entity[] = [];
   /** javascript interval id when simulating on database */
@@ -44,6 +49,7 @@ export default class PathController {
    */
   constructor(private viewer: Cesium.Viewer, public readonly droneSpeed: number) {
     this.property = new KeyedTimePositionProperty(droneSpeed);
+    [this.waypoints, this.setWaypoints] = createSignal([] as Cartographic[]);
   }
 
   /**
@@ -56,6 +62,7 @@ export default class PathController {
     this.drone = drone;
     this.skyWaypointEntities = [];
     this.groundWaypointEntities = [];
+    this.setWaypoints([]);
     this.skyPathEntity = this.viewer.entities.add({
       //Set the entity availability to the same interval as the simulation time.
       availability: foreverInterval,
@@ -120,6 +127,9 @@ export default class PathController {
       },
     });
     this.groundWaypointEntities.push(groundPoint);
+    this.setWaypoints(this.skyWaypointEntities.map(e =>
+      Cartographic.fromCartesian(e.position!.getValue(new Cesium.JulianDate()) as Cartesian3)
+    ));
 
     return groundPoint;
   }
