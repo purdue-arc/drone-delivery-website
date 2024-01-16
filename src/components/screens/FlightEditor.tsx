@@ -5,39 +5,23 @@ import NoteAddIcon from '@suid/icons-material/NoteAdd';
 import SearchIcon from '@suid/icons-material/Search';
 import {createSignal, For, Index} from "solid-js";
 import type PathController from "~/lib/cesium/PathController";
-import {type Cartographic} from "cesium";
+import {type Cartographic, Math as CesiumMath} from "cesium";
+import {graphql} from "~/gql";
+import {createMutation} from "@merged/solid-apollo";
 
-/**
- * TODO: delete
- * @param name
- * @param calories
- * @param fat
- * @param carbs
- * @param protein
- */
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number,
-) {
-  return {name, calories, fat, carbs, protein};
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
+const submitFlightMutation = graphql(`
+    mutation SubmitFlight($drone_id: bigint, $order_id: bigint, $start_lat: float8, $start_long: float8, $end_lat: float8, $end_long: float8, $route: [String!]) {
+        insert_flights_one(object: {drone_id: $drone_id, order_id: $order_id, start_lat: $start_lat, start_long: $start_long, end_lat: $end_lat, end_long: $end_long, route: $route}) {
+            flight_id
+        }
+    }
+`)
 
 
-/** TODO */
+/** Sidebar that shows when editing a drone path on index.tsx page */
 export default function FlightEditor(props: { points: Cartographic[], pathController: PathController }) {
   const [isOpen, setIsOpen] = createSignal(false);
-  const [selectedIndex, setSelectedIndex] = createSignal(0);
+  const addFlight = createMutation(submitFlightMutation)[0]
   let anchorRef: HTMLButtonElement | undefined;
 
   const options = [
@@ -45,6 +29,22 @@ export default function FlightEditor(props: { points: Cartographic[], pathContro
     {name: 'Database', onClick: () => props.pathController.simulateDatabase()},
     {name: 'Stop', onClick: () => props.pathController.endSimulation()},
   ];
+
+  function submitFlight() {
+    if (props.points.length < 2) {
+      alert("Need at least 2 points to submit a flight");
+      return;
+    }
+    addFlight({variables: {
+      drone_id: props.pathController.drone.id,
+      start_long: props.points[0].longitude * CesiumMath.RADIANS_PER_DEGREE,
+      start_lat: props.points[0].latitude * CesiumMath.RADIANS_PER_DEGREE,
+      end_long: props.points.at(-1)!.longitude * CesiumMath.RADIANS_PER_DEGREE,
+      end_lat: props.points.at(-1)!.latitude * CesiumMath.RADIANS_PER_DEGREE,
+      route: props.points.map(pt => pt.toString()),
+      // TODO: orderId
+    }});
+  }
 
   return (
     <Box padding={2}>
@@ -74,7 +74,7 @@ export default function FlightEditor(props: { points: Cartographic[], pathContro
         <Button variant="outlined" ref={anchorRef} onClick={() => setIsOpen(prev => !prev)}>
           Simulate <ArrowDropUpIcon />
         </Button>
-        <Button variant="contained" color="primary" href="/flights/create" sx={{marginLeft: "auto"}}>
+        <Button variant="contained" color="primary" onClick={submitFlight}>
           Submit Flight
         </Button>
       </Stack>

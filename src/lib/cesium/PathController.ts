@@ -40,7 +40,7 @@ export default class PathController {
   /** Because of this, class must be instanced at top-level component. Only need 1 instance */
   private readonly addTelemetry = createMutation(simulateTelemetryMutation)[0];
   /** The Drone owner of the current path */
-  private drone!: Drone;
+  public drone!: Drone;
 
   /**
    * Constructs a new PathController that manages previewing flight paths
