@@ -160,10 +160,11 @@ export default class PathController {
     }
     const gps = Cesium.Cartographic.fromCartesian(pos);
     this.addTelemetry({variables: {
-      heading:  // TODO: not quite sure which direction is 0
+      heading:
         Cesium.HeadingPitchRoll.fromQuaternion(
           this.skyPathEntity!.orientation!.getValue(this.viewer.clock.currentTime) as Cesium.Quaternion
-        ).heading * Cesium.Math.DEGREES_PER_RADIAN,
+        ).heading * Cesium.Math.DEGREES_PER_RADIAN + 90,
+      // Add 90 b/c Drone.setPos expects angle where 0 = North, but fromQuaternion returns angle where 0 = right
       longitude: gps.longitude * Cesium.Math.DEGREES_PER_RADIAN,
       latitude: gps.latitude * Cesium.Math.DEGREES_PER_RADIAN,
       altitude: gps.height,
