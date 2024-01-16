@@ -24,6 +24,7 @@ const dronesPosQuery = graphql(`
             latitude
             longitude
             altitude
+            timestamp
         }
     }
 `);
@@ -100,7 +101,7 @@ export default function Home() {
       console.log(dronesPos());
       for (const drone of dronesPos()?.drone_telemetry ?? []) {
         if (drone.id in drones) {
-          drones[drone.id].setPos(drone.longitude, drone.latitude, drone.altitude, drone.heading);
+          drones[drone.id].setPos(drone.longitude, drone.latitude, drone.altitude, drone.heading, Cesium.JulianDate.fromDate(new Date(drone.timestamp)));
         } else {
           drones[drone.id] = dronesController.addDrone(drone.id, drone.longitude, drone.latitude, drone.altitude, drone.heading);
         }

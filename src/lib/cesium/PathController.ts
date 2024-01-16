@@ -4,6 +4,7 @@ import KeyedTimePositionProperty from "~/lib/cesium/KeyedTimePositionProperty";
 import {droneModel} from "~/lib/cesium/DronesController";
 import {graphql} from "~/gql";
 import {createMutation} from "@merged/solid-apollo";
+import {foreverInterval} from "~/lib/cesium/intervals";
 
 
 const simulateTelemetryMutation = graphql(`
@@ -48,17 +49,7 @@ export default class PathController {
     this.droneId = droneId;
     this.skyPathEntity = this.viewer.entities.add({
       //Set the entity availability to the same interval as the simulation time.
-      availability: new Cesium.TimeIntervalCollection([
-        new Cesium.TimeInterval({
-          start: new Cesium.JulianDate(),
-          // Necessary to view path. INFINITY & MAX_INTEGER don't work
-          stop: Cesium.JulianDate.addDays(
-            Cesium.JulianDate.now(),
-            365,
-            new Cesium.JulianDate(),
-          ),
-        }),
-      ]),
+      availability: foreverInterval,
 
       position: this.property.pathProp,
       orientation: new Cesium.VelocityOrientationProperty(this.property.pathProp),

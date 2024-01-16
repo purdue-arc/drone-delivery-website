@@ -3,6 +3,7 @@ import * as Cesium from "cesium";
 import type {Accessor, Setter} from "solid-js";
 import {pickEntity} from "~/lib/cesium/pickEntity";
 import {Drone} from "~/lib/cesium/Drone";
+import {foreverInterval} from "~/lib/cesium/intervals";
 
 export const droneModel: ModelGraphics.ConstructorOptions = {
   uri: "drone.glb",
@@ -76,9 +77,13 @@ export default class DronesController {
    */
   addDrone(id: number, longitude: number, latitude: number, height: number, heading: number) {
     // TODO: ignore scene lighting, hard to see at night
+    const positionProp = new Cesium.SampledPositionProperty();
+    positionProp.forwardExtrapolationType = Cesium.ExtrapolationType.HOLD;
     return new Drone(this.viewer.entities.add({
         model: droneModel,
         properties: {id},
+        availability: foreverInterval,
+        position: positionProp,
       } satisfies Entity.ConstructorOptions), this.viewer.clock)
       .setPos(
         longitude, latitude, height, heading,

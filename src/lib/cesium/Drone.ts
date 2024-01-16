@@ -28,9 +28,10 @@ export class Drone {
    * @param latitude GPS latitude
    * @param height distance from WGS84 reference ellipsoid to place drone (what you get from GPS)
    * @param heading compass direction (deg) to point in. 0 is north, increase clockwise
+   * @param time when was the drone at this position? Defaults to current timeline position
    * @see addDrone
    */
-  setPos(longitude: number, latitude: number, height: number, heading: number) {
+  setPos(longitude: number, latitude: number, height: number, heading: number, time = this.clock.currentTime) {
     // Cesium uses WGS84 reference ellipsoid (https://epsg.org/ellipsoid_7030/WGS-84.html), same as GPS (https://community.cesium.com/t/get-heighy-value/23064/2)
     // See https://www.unavco.org/education/resources/tutorials-and-handouts/tutorials/geoid-gps-receivers.html for more info on how GPS works
     // Avg height of Purdue is 190m. Cesium renders terrain at the correct height. Check specific height: https://www.daftlogic.com/projects-find-elevation-on-map.htm
@@ -40,10 +41,15 @@ export class Drone {
       position,
       hpr,
     );
-    // @ts-ignore These errors can probably be ignored, seems to work
-    this.entity.position = position;
-    // @ts-ignore
+    const dronePos = this.entity.position as Cesium.SampledPositionProperty;
+    // I tried adding a second to clock.currentTime in an attempt to smooth the path, but jumping still occurred & was worse than using db timestamp.
+    // Guessing need to add new sample at extrapolated point & another 200ms ahead at new point, but not worth it
+    dronePos.addSample(time, position);
+    // @ts-ignore This error can probably be ignored, seems to work
     this.entity.orientation = orientation;
+
+    if (dronePos._property._times.length > 1)
+      dronePos.forwardExtrapolationType = Cesium.ExtrapolationType.EXTRAPOLATE;
     return this;
   }
 
