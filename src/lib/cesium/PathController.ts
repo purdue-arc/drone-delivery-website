@@ -5,6 +5,7 @@ import {droneModel} from "~/lib/cesium/DronesController";
 import {graphql} from "~/gql";
 import {createMutation} from "@merged/solid-apollo";
 import {foreverInterval} from "~/lib/cesium/intervals";
+import type {Drone} from "~/lib/cesium/Drone";
 
 
 const simulateTelemetryMutation = graphql(`
@@ -23,12 +24,16 @@ export default class PathController {
   private previewId = -1;
   /** Cesium entity corresponding to the yellow path in the sky */
   private skyPathEntity: Cesium.Entity | undefined;
+  /** Cesium entity corresponding to the white path on the ground */
+  private groundPathEntity: Cesium.Entity | undefined;
+  /** Yellow circles in the sky allowing for adjusting sky path */
+  private skyWaypointEntities: Cesium.Entity[] = [];
   /** javascript interval id when simulating on database */
   private simulationInterval: number | undefined;
   /** Because of this, class must be instanced at top-level component. Only need 1 instance */
   private readonly addTelemetry = createMutation(simulateTelemetryMutation)[0];
   /** The Drone owner of the current path */
-  private droneId = -1;
+  private drone!: Drone;
 
   /**
    * Constructs a new PathController that manages previewing flight paths
@@ -41,12 +46,13 @@ export default class PathController {
 
   /**
    * Start a new flight path. Resets internal state & adds path entity to scene
-   * @param droneId The Drone owner of the new path
+   * @param drone The Drone owner of the new path
    */
-  beginPath(droneId: number) {
+  beginPath(drone: Drone) {
     this.property = new KeyedTimePositionProperty(this.droneSpeed);
     this.previewId = -1;
-    this.droneId = droneId;
+    this.drone = drone;
+    this.skyWaypointEntities = [];
     this.skyPathEntity = this.viewer.entities.add({
       //Set the entity availability to the same interval as the simulation time.
       availability: foreverInterval,
@@ -71,7 +77,7 @@ export default class PathController {
     // });
 
     // Add the white path on the ground
-    this.viewer.entities.add({
+    this.groundPathEntity = this.viewer.entities.add({
       polyline: {
         positions: this.property.positionProp,
         clampToGround: true,
@@ -90,7 +96,7 @@ export default class PathController {
 
     //Also create a point for each sample we generate.
     // TODO: allow clicking through handles & line when placing points, otherwise can cause weird stacking
-    this.viewer.entities.add({
+    this.skyWaypointEntities.push(this.viewer.entities.add({
       position: position,
       point: {
         pixelSize: 8,
@@ -98,7 +104,7 @@ export default class PathController {
         outlineColor: Cesium.Color.YELLOW,
         outlineWidth: 3,
       },
-    });
+    }));
   }
 
   /**
@@ -122,8 +128,12 @@ export default class PathController {
 
   /** Remove preview entities from screen & stop simulating */
   clearPath() {
-    clearInterval(this.simulationInterval);
-    // TODO: Remove preview entities
+    this.endSimulation();
+    if (!this.skyPathEntity)
+      throw "No path to clear";
+    this.viewer.entities.remove(this.skyPathEntity);
+    this.viewer.entities.remove(this.groundPathEntity!);  // Defined together with skyPathEntity
+    this.skyWaypointEntities.forEach(e => this.viewer.entities.remove(e));
   }
 
   /** Simulate the created drone path by animating a drone along its path (does not write to database) */
@@ -137,6 +147,7 @@ export default class PathController {
   /** Simulate the created drone path by sending fake telemetry events to the database */
   simulateDatabase() {
     this.simulateLocal();
+    this.drone.extrapolation = Cesium.ExtrapolationType.EXTRAPOLATE;
     const simulationFrequency = 1000;
     this.simulationInterval = window.setInterval(this.simulateDatabaseTick.bind(this), simulationFrequency);
   }
@@ -146,7 +157,7 @@ export default class PathController {
     console.log("tick...");
     const pos = this.property.pathProp.getValue(this.viewer.clock.currentTime);
     if (pos == undefined) {
-      clearInterval(this.simulationInterval);
+      this.endSimulation();
       return;
     }
     const gps = Cesium.Cartographic.fromCartesian(pos);
@@ -159,17 +170,18 @@ export default class PathController {
       longitude: gps.longitude * Cesium.Math.DEGREES_PER_RADIAN,
       latitude: gps.latitude * Cesium.Math.DEGREES_PER_RADIAN,
       altitude: gps.height,
-      drone_id: this.droneId,
+      drone_id: this.drone.id,
       timestamp: Cesium.JulianDate.toDate(this.viewer.clock.currentTime).getTime(),
     }});
   }
 
-  /** Stop simulation & clean up objects */
+  /** Stop simulation & clean up objects. If no active path, log a warning, not an exception */
   endSimulation() {
-    if (!this.skyPathEntity)
-      throw "No path to simulate";
-    this.skyPathEntity.model = undefined;
-    this.skyPathEntity.orientation = undefined;
-    window.clearInterval(this.simulationInterval);
+    if (this.skyPathEntity) {
+      this.skyPathEntity.model = undefined;
+      window.clearInterval(this.simulationInterval);
+      this.drone.extrapolation = Cesium.ExtrapolationType.HOLD;
+    } else
+      console.warn("No simulation to end");
   }
 }

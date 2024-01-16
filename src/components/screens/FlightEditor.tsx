@@ -41,7 +41,8 @@ export default function FlightEditor(props: { points: string[], pathController: 
 
   const options = [
     {name: 'Local', onClick: () => props.pathController.simulateLocal()},
-    {name: 'Database', onClick: () => props.pathController.simulateDatabase()}
+    {name: 'Database', onClick: () => props.pathController.simulateDatabase()},
+    {name: 'Stop', onClick: () => props.pathController.endSimulation()},
   ];
 
   return (

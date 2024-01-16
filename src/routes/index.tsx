@@ -1,6 +1,6 @@
 import * as Cesium from "cesium";
 import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from "cesium";
-import {createEffect, createSignal, onCleanup, onMount, Show} from "solid-js";
+import {createEffect, createSignal, onCleanup, onMount, Show, untrack} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import Tooltip from "~/components/Tooltip";
@@ -41,8 +41,10 @@ export default function Home() {
   createEffect(() => {
     if (isDrawingPath())
       setFlightEditorIsShowing(true);
-    else if (selectedDroneId() == undefined)
+    else if (selectedDroneId() == undefined && untrack(flightEditorIsShowing)) {
       setFlightEditorIsShowing(false);
+      pathController.clearPath();
+    }
   });
 
   let viewer: Cesium.Viewer;
@@ -70,9 +72,9 @@ export default function Home() {
   function startDrawingPath() {
     setIsDrawingPath(true);
     setPopupPos(undefined);
-    pathController.beginPath(selectedDroneId()!);
     // TODO: load from db if exists
     const selectedDrone = drones[selectedDroneId()!];
+    pathController.beginPath(selectedDrone);
     const dronePos = selectedDrone.position;
     // Create the first floating point
     floatingPoint = createPoint(dronePos);
@@ -93,7 +95,7 @@ export default function Home() {
       animation: true,
     });
 
-    const dronesController = new DronesController(viewer, setPopupPos, isDrawingPath);
+    const dronesController = new DronesController(viewer, setPopupPos, flightEditorIsShowing);
     pathController = new PathController(viewer, 10);
 
     // Update or add all drone positions
@@ -133,7 +135,7 @@ export default function Home() {
     handler.setInputAction(function(event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position);
       if (!isDrawingPath())
-        setSelectedDroneId(selectedDrone?.getProps()?.id);
+        setSelectedDroneId(selectedDrone?.id);
       if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
         return;
       }
@@ -192,7 +194,7 @@ export default function Home() {
   });
 
   onCleanup(() => {
-    pathController.clearPath();
+    pathController.endSimulation();
   })
 
   let altPressed = false;

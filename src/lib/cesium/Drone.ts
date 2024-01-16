@@ -22,6 +22,14 @@ export class Drone {
     return this.entity.position!.getValue(this.clock.currentTime) as Cartesian3
   }
 
+  get id() {
+    return this.getProps().id;
+  }
+
+  set extrapolation(type: Cesium.ExtrapolationType) {
+    (this.entity.position as Cesium.SampledPositionProperty).forwardExtrapolationType = type;
+  }
+
   /**
    * Change position of a Cesium entity
    * @param longitude GPS longitude
@@ -41,15 +49,11 @@ export class Drone {
       position,
       hpr,
     );
-    const dronePos = this.entity.position as Cesium.SampledPositionProperty;
     // I tried adding a second to clock.currentTime in an attempt to smooth the path, but jumping still occurred & was worse than using db timestamp.
     // Guessing need to add new sample at extrapolated point & another 200ms ahead at new point, but not worth it
-    dronePos.addSample(time, position);
+    (this.entity.position as Cesium.SampledPositionProperty).addSample(time, position);
     // @ts-ignore This error can probably be ignored, seems to work
     this.entity.orientation = orientation;
-
-    if (dronePos._property._times.length > 1)
-      dronePos.forwardExtrapolationType = Cesium.ExtrapolationType.EXTRAPOLATE;
     return this;
   }
 
