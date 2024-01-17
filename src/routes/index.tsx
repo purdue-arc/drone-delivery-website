@@ -199,7 +199,7 @@ export default function Home() {
       <Stack direction="row">
         <div id="cesiumContainer" />
         <Show when={flightEditorIsShowing()}>
-          <FlightEditor points={pathController!.waypoints()} pathController={pathController!} />
+          <FlightEditor points={pathController!.waypoints()} pathController={pathController!} close={() => setSelectedDroneId(undefined)} />
         </Show>
       </Stack>
       <Show when={popupPos()?.x && popupPos()?.y && selectedDroneId() != undefined && !flightEditorIsShowing()}>
