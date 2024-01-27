@@ -35,7 +35,7 @@ export default function BatteryFragment(props: {id: number | string}) {
   const battery = () => droneWarnings()?.me?.telemetry[0]?.battery;
 
   return (
-    <LabeledIcon>
+    <LabeledIcon title="Battery charge">
       <Dynamic component={batteryStatus[Math.round((battery() ?? 0) / 100 * (batteryStatus.length - 1))]} sx={{ marginRight: "0.5em" }} />
       {battery()}%
     </LabeledIcon>

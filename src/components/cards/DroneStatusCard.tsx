@@ -61,15 +61,15 @@ export default function DroneStatusCard() {
             <Box sx={{textAlign: "center"}}>
               <img src="/drone.jpg" width="150px"  alt="Drone" />
             </Box>
-            <LabeledIcon>
+            <LabeledIcon title="GPS location">
               <PlaceIcon sx={{ marginRight: "0.5em" }} />
               ({telemetry()!.latitude}, {telemetry()!.longitude})
             </LabeledIcon>
-            <LabeledIcon>
+            <LabeledIcon title="Heading (degrees)">
               <CompassIcon sx={{ marginRight: "0.5em" }} />
-              {telemetry()!.heading}
+              {telemetry()!.heading}°
             </LabeledIcon>
-            <LabeledIcon>
+            <LabeledIcon title="Speed">
               <SpeedIcon sx={{ marginRight: "0.5em" }} />
               {telemetry()!.velocity} mph
             </LabeledIcon>
