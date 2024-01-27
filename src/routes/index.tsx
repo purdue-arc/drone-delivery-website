@@ -66,6 +66,7 @@ export default function Home() {
   }
 
   onMount(() => {
+    let altitude = 100;
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
     const dronesPos = createSubscription(dronesPosQuery);
     viewer = new Cesium.Viewer("cesiumContainer", {
@@ -130,7 +131,7 @@ export default function Home() {
       if (Cesium.defined(earthPosition)) {
         // Create another point that's permanent
         createPoint(earthPosition);
-        pathController.extendPath(addHeight(earthPosition, 100));
+        pathController.extendPath(addHeight(earthPosition, altitude));
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
@@ -140,7 +141,7 @@ export default function Home() {
         if (!altPressed) {
           const newPosition = viewer.scene.pickPosition(event.endPosition);
           if (Cesium.defined(newPosition)) {
-            pathController.previewPath(addHeight(newPosition, 100));
+            pathController.previewPath(addHeight(newPosition, altitude));
             floatingPoint.position.setValue(newPosition);
           }
         }
@@ -163,6 +164,30 @@ export default function Home() {
       pathController.simulateLocal();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
+    function handleKeyDown(event: KeyboardEvent) {
+    console.log("key down");
+    // if alt key is pressed
+    if (event.altKey) {
+      console.log(altitude);
+      altitude -= 10;
+      console.log("alt changed: ", altitude);
+      console.log("alt pressed");
+    }
+    if (event.shiftKey) {
+      console.log(altitude);
+      altitude += 10;
+      console.log("alt changed: ", altitude);
+      console.log("shift pressed");
+    }
+  }
+  //  function handleKeyUp(event: KeyboardEvent) {
+  //   console.log("key up");
+  //   // if alt key is pressed
+  //   if (event.altKey) {
+  //   }
+  // }
+  window.addEventListener("keydown", handleKeyDown);
+  // window.addEventListener("keyup", handleKeyUp);
 
     // Zoom in to Purdue
     const PURDUE_LOCATION = Cartesian3.fromDegrees(-86.9201571, 40.427593, 200.0);
@@ -178,25 +203,14 @@ export default function Home() {
       }),
     );
   });
+  // check if a key is pressed
+
 
   let altPressed = false;
 
-  function handleKeyDown(event: KeyboardEvent) {
-    // if alt key is pressed
-    if (event.altKey) {
-      altPressed = true;
-    }
-  }
-
-  function handleKeyUp(event: KeyboardEvent) {
-    // if alt key is pressed
-    if (event.altKey) {
-      altPressed = false;
-    }
-  }
-
   return (
-    <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+    // <main onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+    <main>
       <div id="drawingOptions" />
       <div id="cesiumContainer" />
       <Show when={popupPos()?.x && popupPos()?.y && selectedDroneId() != undefined}>
