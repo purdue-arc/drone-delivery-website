@@ -63,7 +63,8 @@ export default function Home() {
   }
 
   onMount(() => {
-    let altitude = 100;
+    // let altitude = 100;
+    const [altitude, setAltitude] = createSignal(100);
     Cesium.Ion.defaultAccessToken = CESSIUM_ACCESS_TOKEN;
     const dronesPos = createSubscription(dronesPosQuery);
     viewer = new Cesium.Viewer("cesiumContainer", {
@@ -127,19 +128,27 @@ export default function Home() {
       // `earthPosition` will be undefined if our mouse is not over the globe.
       if (Cesium.defined(earthPosition)) {
         // Create another point that's permanent (inside extendPath)
-        pathController.extendPath(addHeight(earthPosition, altitude));
+        pathController.extendPath(addHeight(earthPosition, altitude()));
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
+    function updatePosition(newPosition: Cesium.Cartesian3) {
+      if (Cesium.defined(floatingPoint)) {
+        if (!altPressed) {
+          if (Cesium.defined(newPosition)) {
+            pathController.previewPath(addHeight(newPosition, altitude()));
+            floatingPoint.position.setValue(newPosition);
+          }
+        }
+      }
+    }
+    let lastKnownPosition = null;
     // Mouse move handler to change the position of the floating point
     handler.setInputAction(function(event) {
+      lastKnownPosition = event.endPosition;
       if (Cesium.defined(floatingPoint)) {
         if (!altPressed) {
           const newPosition = viewer.scene.pickPosition(event.endPosition);
-          if (Cesium.defined(newPosition)) {
-            pathController.previewPath(addHeight(newPosition, altitude));
-            floatingPoint.position.setValue(newPosition);
-          }
+          updatePosition(newPosition);
         }
       }
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
@@ -157,15 +166,32 @@ export default function Home() {
       setIsDrawingPath(false);
       terminateShape();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+    // handler.setInputAction(function(event) {
+    //   const newPosition = viewer.scene.pickPosition(event.endPosition);
+    //   updatePosition(newPosition);
+    // }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    // modify altitude
     function handleKeyDown(event: KeyboardEvent) {
       // if alt key is pressed
       if (event.altKey) {
-        altitude -= 10;
-        console.log(altitude);
-      }
+        setAltitude(altitude() - 10);
+        console.log(altitude());
+        if (lastKnownPosition) {
+          console.log("last known position");
+          console.log(lastKnownPosition);
+          const newPosition = viewer.scene.pickPosition(lastKnownPosition);
+          updatePosition(newPosition);
+        }
+  }
       if (event.shiftKey)  {
-        altitude += 10;
-        console.log(altitude);
+        setAltitude(altitude() + 10);
+        console.log(altitude());
+        if (lastKnownPosition) {
+          console.log("last known position");
+          console.log(lastKnownPosition);
+          const newPosition = viewer.scene.pickPosition(lastKnownPosition);
+          updatePosition(newPosition);
+        }
       }
     }
     window.addEventListener("keydown", handleKeyDown);
