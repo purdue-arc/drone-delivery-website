@@ -11,11 +11,13 @@ import NewOrderDialog, {OrderSummary} from "~/components/NewOrderDialog";
 import NoteAddIcon from "@suid/icons-material/NoteAdd";
 
 const submitFlightMutation = graphql(`
-    mutation SubmitFlight($drone_id: bigint, $order_id: bigint, $start_lat: float8, $start_long: float8, $end_lat: float8, $end_long: float8, $route: [String!]) {
-        insert_flights_one(object: {drone_id: $drone_id, order_id: $order_id, start_lat: $start_lat, start_long: $start_long, end_lat: $end_lat, end_long: $end_long, route: $route}) {
-            flight_id
-        }
+mutation InsertFlights($order_id: bigint, $drone_id: bigint, $route: [String!]) {
+  insert_flights(objects: {order_id: $order_id, drone_id: $drone_id, route: $route}) {
+    returning {
+      flight_id
     }
+  }
+}
 `)
 
 
@@ -46,10 +48,6 @@ export default function FlightEditor(props: { points: Cartographic[], pathContro
     }
     addFlight({variables: {
       drone_id: props.pathController.drone.id,
-      start_long: props.points[0].longitude / CesiumMath.RADIANS_PER_DEGREE,
-      start_lat: props.points[0].latitude / CesiumMath.RADIANS_PER_DEGREE,
-      end_long: props.points.at(-1)!.longitude / CesiumMath.RADIANS_PER_DEGREE,
-      end_lat: props.points.at(-1)!.latitude / CesiumMath.RADIANS_PER_DEGREE,
       route: props.points.map(pt => pt.toString()),
       order_id: attachedOrder()?.orderId,
     }}).then(props.close).catch(alert);
