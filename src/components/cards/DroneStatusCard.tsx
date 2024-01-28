@@ -16,7 +16,7 @@ import BatteryFragment from "~/components/info-fragments/BatteryFragment";
 const statusQuery = graphql(`
     subscription DroneInfo($droneId: bigint!) {
         me: drones_by_pk(drone_id: $droneId) {
-            telemetry: drone_telemetries(limit: 1, order_by: {timestamp: desc}) {
+            telemetry:  (limit: 1, order_by: {timestamp: desc}) {
                 altitude
                 battery
                 heading

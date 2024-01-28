@@ -13,6 +13,7 @@ import {addHeight} from "~/lib/cesium/addHeight";
 import {Stack} from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
 import {Drone} from "~/lib/cesium/Drone";
+import AltitudePathGraph from "~/components/info-fragments/altitudePath";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
@@ -177,8 +178,6 @@ export default function Home() {
         setAltitude(altitude() - 10);
         console.log(altitude());
         if (lastKnownPosition) {
-          console.log("last known position");
-          console.log(lastKnownPosition);
           const newPosition = viewer.scene.pickPosition(lastKnownPosition);
           updatePosition(newPosition);
         }
@@ -187,8 +186,6 @@ export default function Home() {
         setAltitude(altitude() + 10);
         console.log(altitude());
         if (lastKnownPosition) {
-          console.log("last known position");
-          console.log(lastKnownPosition);
           const newPosition = viewer.scene.pickPosition(lastKnownPosition);
           updatePosition(newPosition);
         }
@@ -223,6 +220,7 @@ export default function Home() {
       <div id="drawingOptions" />
       <Stack direction="row">
         <div id="cesiumContainer" />
+        {/* create a div where i will have a graph */}
         <Show when={flightEditorIsShowing()}>
           <FlightEditor points={pathController!.waypoints()} pathController={pathController!} close={() => setSelectedDroneId(undefined)} />
         </Show>
@@ -231,6 +229,7 @@ export default function Home() {
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
           <DroneTooltipContents id={selectedDroneId()!} onStartDrawingPath={startDrawingPath} />
         </Tooltip>
+        <AltitudePathGraph id={selectedDroneId() ?? 0} />
       </Show>
     </main>
   );
