@@ -48,6 +48,7 @@
     "@suid/material": "^0.15.0",
     "@turf/buffer": "^6.5.0",
     "@turf/collect": "^6.5.0",
+    "chart.js": "^4.4.1",
     "graphql": "^16.8.1",
     "graphql-ws": "^5.14.1",
     "maplibre-gl": "^2.4.0",

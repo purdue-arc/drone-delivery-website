@@ -76,9 +76,9 @@ export default function FlightEditor(props: { points: Cartographic[], pathContro
         </IconButton>
       </fieldset>
 
-      <Typography variant="h4">Waypoints</Typography>
+      {/* <Typography variant="h4">Waypoints</Typography>
 
-      <Index each={props.points}>{(point, i) => <li>{point().toString()}</li>}</Index>
+      <Index each={props.points}>{(point, i) => <li>{point().toString()}</li>}</Index> */}
 
       <Stack spacing={2} direction="row" justifyContent="right">
         <Button variant="outlined" ref={anchorRef} onClick={() => setIsOpen(prev => !prev)}>

@@ -176,7 +176,6 @@ export default function Home() {
       // if alt key is pressed
       if (event.altKey) {
         setAltitude(altitude() - 10);
-        console.log(altitude());
         if (lastKnownPosition) {
           const newPosition = viewer.scene.pickPosition(lastKnownPosition);
           updatePosition(newPosition);
@@ -184,7 +183,6 @@ export default function Home() {
   }
       if (event.shiftKey)  {
         setAltitude(altitude() + 10);
-        console.log(altitude());
         if (lastKnownPosition) {
           const newPosition = viewer.scene.pickPosition(lastKnownPosition);
           updatePosition(newPosition);
@@ -229,8 +227,10 @@ export default function Home() {
         <Tooltip x={popupPos()!.x} y={popupPos()!.y}>
           <DroneTooltipContents id={selectedDroneId()!} onStartDrawingPath={startDrawingPath} />
         </Tooltip>
-        <AltitudePathGraph id={selectedDroneId() ?? 0} />
       </Show>
+      <Show when={selectedDroneId() != undefined && flightEditorIsShowing()}>
+        <AltitudePathGraph id={selectedDroneId()!} points={pathController!.waypoints()} />
+        </Show>
     </main>
   );
 }
