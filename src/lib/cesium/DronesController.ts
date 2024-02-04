@@ -4,6 +4,7 @@ import type {Accessor, Setter} from "solid-js";
 import {pickEntity} from "~/lib/cesium/pickEntity";
 import {Drone} from "~/lib/cesium/Drone";
 import {foreverInterval} from "~/lib/cesium/intervals";
+import {HistoricPathRenderer} from "~/lib/cesium/HistoricPathRenderer";
 
 export const droneModel: ModelGraphics.ConstructorOptions = {
   uri: "drone.glb",
@@ -84,7 +85,7 @@ export default class DronesController {
         properties: {id},
         availability: foreverInterval,
         position: positionProp,
-      } satisfies Entity.ConstructorOptions), this.viewer.clock)
+      } satisfies Entity.ConstructorOptions), this.viewer.clock, new HistoricPathRenderer(this.viewer.entities))
       .setPos(
         longitude, latitude, height, heading,
       );

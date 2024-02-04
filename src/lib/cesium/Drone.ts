@@ -1,6 +1,7 @@
 import type {Cartesian3, Clock, Entity} from "cesium";
 import * as Cesium from "cesium";
 import PathController from "~/lib/cesium/PathController";
+import {HistoricPathRenderer} from "~/lib/cesium/HistoricPathRenderer";
 
 
 export interface DroneProperties {
@@ -15,7 +16,7 @@ export class Drone {
    * @param entity Drone Entity to wrap
    * @param clock Clock instance for Viewer which this Drone belongs. Used for getting position
    */
-  constructor(private readonly entity: Entity, private readonly clock: Clock) {
+  constructor(private readonly entity: Entity, private readonly clock: Clock, private readonly historicPathRenderer?: HistoricPathRenderer) {
   }
 
   get position() {
@@ -54,6 +55,8 @@ export class Drone {
     (this.entity.position as Cesium.SampledPositionProperty).addSample(time, position);
     // @ts-ignore This error can probably be ignored, seems to work
     this.entity.orientation = orientation;
+
+    this.historicPathRenderer?.addWaypoint(position);
     return this;
   }
 
