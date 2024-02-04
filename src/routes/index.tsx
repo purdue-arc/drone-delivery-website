@@ -142,7 +142,7 @@ export default function Home() {
         }
       }
     }
-    let lastKnownPosition = null;
+    let lastKnownPosition: Cartesian2 | null = null;
     // Mouse move handler to change the position of the floating point
     handler.setInputAction(function(event) {
       lastKnownPosition = event.endPosition;

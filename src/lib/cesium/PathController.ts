@@ -195,8 +195,8 @@ export default class PathController {
           this.skyPathEntity!.orientation!.getValue(this.viewer.clock.currentTime) as Cesium.Quaternion
         ).heading * Cesium.Math.DEGREES_PER_RADIAN + 90,
       // Add 90 b/c Drone.setPos expects angle where 0 = North, but fromQuaternion returns angle where 0 = right
-      longitude: gps.longitude * Cesium.Math.DEGREES_PER_RADIAN,
-      latitude: gps.latitude * Cesium.Math.DEGREES_PER_RADIAN,
+      longitude: Cesium.Math.toDegrees(gps.longitude),
+      latitude: Cesium.Math.toDegrees(gps.latitude),
       altitude: gps.height,
       drone_id: this.drone.id,
       timestamp: Cesium.JulianDate.toDate(this.viewer.clock.currentTime).getTime(),
