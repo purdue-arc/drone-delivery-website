@@ -2,7 +2,7 @@ import {Box, Button, IconButton, MenuItem, MenuList, Paper, Popper, Stack, Typog
 import ClickAwayListener from "~/components/generic/ClickAwayListener";
 import ArrowDropUpIcon from '@suid/icons-material/ArrowDropUp';
 import SearchIcon from '@suid/icons-material/Search';
-import {createSignal, For, Index, Show} from "solid-js";
+import {createSignal, For, Show} from "solid-js";
 import type PathController from "~/lib/cesium/PathController";
 import {type Cartographic, Math as CesiumMath} from "cesium";
 import {graphql} from "~/gql";
@@ -48,7 +48,7 @@ export default function FlightEditor(props: { points: Cartographic[], pathContro
     }
     addFlight({variables: {
       drone_id: props.pathController.drone.id,
-      route: props.points.map(pt => pt.toString()),
+      route: props.points.map(pt => JSON.stringify([CesiumMath.toDegrees(pt.latitude), CesiumMath.toDegrees(pt.longitude), pt.height])),
       order_id: attachedOrder()?.orderId,
     }}).then(props.close).catch(alert);
   }

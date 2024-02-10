@@ -86,8 +86,8 @@ export default function NewOrderDialog(props: {setOrder: (o: OrderSummary) => vo
       food_items: (formData.get("items") as string).split("\n"),
       placed_at: new Date().getTime(),
       user_id: nhost.auth.getSession()!.user.id,
-      dest_lat: props.dst.latitude / CesiumMath.RADIANS_PER_DEGREE,
-      dest_long: props.dst.longitude / CesiumMath.RADIANS_PER_DEGREE,
+      dest_lat: CesiumMath.toDegrees(props.dst.latitude),
+      dest_long: CesiumMath.toDegrees(props.dst.longitude),
     }}).then(({insert_orders_one: res}) =>
       props.setOrder({
         orderId: res!.order_id,

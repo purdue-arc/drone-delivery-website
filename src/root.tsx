@@ -7,7 +7,7 @@ import {Box, useTheme} from "@suid/material";
 import {ApolloProvider} from "@merged/solid-apollo";
 import gqlClient from "~/lib/gqlClient";
 import Auth from "./routes/signin";
-import { nhost } from "~/lib/nHost";
+import {nhost} from "~/lib/nHost";
 
 /** Render the frame common to all routes (navigation, graphql provider, auth) */
 export default function Root() {
@@ -26,7 +26,7 @@ export default function Root() {
   return (
     <Html lang="en">
       <Head>
-        <Title>SolidStart - Bare</Title>
+        <Title>Drone Delivery Admin Dashboard</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>

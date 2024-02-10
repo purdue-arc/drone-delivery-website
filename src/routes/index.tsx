@@ -13,7 +13,7 @@ import {addHeight} from "~/lib/cesium/addHeight";
 import {Stack} from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
 import {Drone} from "~/lib/cesium/Drone";
-import AltitudePathGraph from "~/components/info-fragments/altitudePath";
+import AltitudePathGraph from "~/components/info-fragments/AltitudePath";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
@@ -142,7 +142,7 @@ export default function Home() {
         }
       }
     }
-    let lastKnownPosition = null;
+    let lastKnownPosition: Cartesian2 | null = null;
     // Mouse move handler to change the position of the floating point
     handler.setInputAction(function(event) {
       lastKnownPosition = event.endPosition;
