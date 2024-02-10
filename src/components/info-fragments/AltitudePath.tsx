@@ -28,10 +28,11 @@ export default function AltitudePathGraph(props: {id: number, points: Cartograph
     let chart: Chart | null = null;
     const droneAltitudeInfo = createSubscription(altitudeQuery, {variables: {droneId: props.id}});
     createEffect(() => console.log(droneAltitudeInfo()));
-    // make a list of altitude values and update it whenever props.points changes
-    const [altitudes, setAltitudes] = createSignal<number[]>([]);
+    // the altitude should have a value of 0 in index 0
+    const [altitudes, setAltitudes] = createSignal<number[]>([0]);
     createEffect(() => {
         const newAltitudes = props.points.map(pt => pt.height);
+        newAltitudes.unshift(0);
         setAltitudes(newAltitudes);
         // console.log("altitudes");
         // console.log(newAltitudes);
@@ -47,7 +48,7 @@ export default function AltitudePathGraph(props: {id: number, points: Cartograph
         return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
       }
     // calculate the distance between each point and add it to a list and upadate it whenever props.points changes
-    const [distances, setDistances] = createSignal<number[]>([]);
+    const [distances, setDistances] = createSignal<number[]>([0]);
     createEffect(() => {
         const newDistances = [];
         for (let i = 0; i < props.points.length - 1; i++) {
@@ -62,6 +63,7 @@ export default function AltitudePathGraph(props: {id: number, points: Cartograph
 
             newDistances.push(calculateLatLongDistance(lat1, lon1, lat2, lon2));
         }
+        newDistances.unshift(0);
         setDistances(newDistances);
         // console.log("distances");
         // console.log(newDistances);

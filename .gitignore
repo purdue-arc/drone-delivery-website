@@ -29,3 +29,5 @@ Thumbs.db
 *.icloud
 
 *.local
+.secrets
+.nhost
