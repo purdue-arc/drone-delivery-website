@@ -5,6 +5,8 @@ import {GraphQLWsLink} from "@apollo/client/link/subscriptions";
 import {createClient} from "graphql-ws";
 import {getMainDefinition} from "@apollo/client/utilities";
 import {ApolloClient} from "@merged/solid-apollo";
+import {isServer} from "solid-js/web";
+import ws from "ws";
 import {nhost} from "~/lib/nHost";
 
 
@@ -26,6 +28,10 @@ const wsLink = new GraphQLWsLink(createClient({
   connectionParams: {
     headers,
   },
+  // It doesn't really make sense to open a websocket connection for something that just fetches once,
+  // But the alternative is dynamically rewriting gql requests (subscription -> query)
+  // See https://stackoverflow.com/questions/61743153
+  webSocketImpl: isServer ? ws : undefined,
 }));
 
 const splitLink = split(
