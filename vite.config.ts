@@ -1,10 +1,12 @@
-import solid from "solid-start/vite";
 import cesium from 'vite-plugin-cesium';
-import {defineConfig} from "vite";
+import {defineConfig} from "@solidjs/start/config";
 import suidPlugin from "@suid/vite-plugin";
 
 export default defineConfig({
-  plugins: [suidPlugin(), solid({ssr: false}), cesium()],
+  plugins: [suidPlugin(), cesium()],
+  start: {
+    ssr: false,
+  },
   server: {
     host: true,
     port: 8080

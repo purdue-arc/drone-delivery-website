@@ -1,4 +1,4 @@
-import {Title} from "solid-start";
+import {Title} from "@solidjs/start";
 import {HttpStatusCode} from "solid-start/server";
 
 /** Requested URL not found */
