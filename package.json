@@ -1,5 +1,8 @@
 {
   "name": "drone-delivery-website",
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present"
+  },
   "gitHooks": {
     "pre-commit": "eslint --ext .tsx,.ts src/"
   },
