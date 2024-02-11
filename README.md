@@ -73,5 +73,3 @@ By default, `npm run build` will generate a Node app that you can run with `npm 
    - Hasura
    - GraphQL
 6. Vite: Build tool
-7. Npm: [package](//npmjs.com) & [workspace](//docs.npmjs.com/cli/v7/using-npm/workspaces) manager
-   - run `npm init -w ./packages/a` to add new package to monorepo
