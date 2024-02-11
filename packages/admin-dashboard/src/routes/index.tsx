@@ -47,16 +47,6 @@ export default function Home() {
     }
   });
 
-  createEffect(() => {
-    if (!viewer)
-      return;
-    const id = selectedDroneId();
-    if (id != undefined)
-      viewer.trackedEntity = drones[id].entity;
-    if (id == undefined || flightEditorIsShowing())
-      viewer.trackedEntity = undefined;
-  });
-
   let viewer: Cesium.Viewer;
   const drones: Record<number, Drone> = {};
   let pathController: PathController;
