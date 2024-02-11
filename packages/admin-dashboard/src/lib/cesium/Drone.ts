@@ -16,7 +16,7 @@ export class Drone {
    * @param entity Drone Entity to wrap
    * @param clock Clock instance for Viewer which this Drone belongs. Used for getting position
    */
-  constructor(private readonly entity: Entity, private readonly clock: Clock, private readonly historicPathRenderer?: HistoricPathRenderer) {
+  constructor(public readonly entity: Entity, private readonly clock: Clock, private readonly historicPathRenderer?: HistoricPathRenderer) {
   }
 
   get position() {
