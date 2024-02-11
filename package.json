@@ -2,7 +2,7 @@
   "name": "drone-delivery-website",
   "private": true,
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present"
+    "dev": "pnpm --recursive run dev"
   },
   "gitHooks": {
     "pre-commit": "eslint --ext .tsx,.ts src/"
