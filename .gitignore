@@ -7,11 +7,10 @@ dist
 netlify
 
 # Generated Files
-/src/gql
-vite.config.ts.timestamp*
+**/vite.config.ts.timestamp*
 
 # dependencies
-/node_modules
+**/node_modules
 
 # IDEs and editors
 /.idea
