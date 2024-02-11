@@ -1,15 +1,15 @@
-import {Box, Button, IconButton, MenuItem, MenuList, Paper, Popper, Stack, Typography} from "@suid/material"; 
-import {createEffect, createSignal, For, Index, onMount, Show, untrack, subscribe} from "solid-js";
+import {Box, Typography} from "@suid/material";
+import {createEffect, createSignal, onMount} from "solid-js";
 import {graphql} from "~/gql";
-import { createSubscription } from "@merged/solid-apollo";
+import {createSubscription} from "@merged/solid-apollo";
 import {Cartographic, Math as CesiumMath} from "cesium";
-import { Chart, registerables } from "chart.js";
+import {Chart, registerables} from "chart.js";
 
 Chart.register(...registerables);
 
 // write a graphql query to get the altitude of the current drone id from the drone_telemetry databse
 const altitudeQuery = graphql(`
-subscription DroneInfo($droneId: bigint!) {
+subscription AltitudeInfo($droneId: bigint!) {
     info: drone_telemetry(where: {drone_id: {_eq: $droneId}}, order_by: {timestamp: desc}) {
       altitude
       latitude
@@ -41,10 +41,10 @@ export default function AltitudePathGraph(props: {id: number, points: Cartograph
     function calculateLatLongDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
         const p = 0.017453292519943295;    // Math.PI / 180
         const c = Math.cos;
-        const a = 0.5 - c((lat2 - lat1) * p)/2 + 
-                  c(lat1 * p) * c(lat2 * p) * 
+        const a = 0.5 - c((lat2 - lat1) * p)/2 +
+                  c(lat1 * p) * c(lat2 * p) *
                   (1 - c((lon2 - lon1) * p))/2;
-      
+
         return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
       }
     // calculate the distance between each point and add it to a list and upadate it whenever props.points changes
@@ -98,7 +98,7 @@ export default function AltitudePathGraph(props: {id: number, points: Cartograph
             chart.update();
         }
     });
-    
+
 
     return (
         // simple heaading that says graph
