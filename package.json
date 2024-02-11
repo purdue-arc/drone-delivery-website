@@ -1,5 +1,6 @@
 {
   "name": "drone-delivery-website",
+  "private": true,
   "scripts": {
     "dev": "npm run dev --workspaces --if-present"
   },
@@ -8,8 +9,5 @@
   },
   "engines": {
     "node": ">=16.8"
-  },
-  "workspaces": [
-    "packages/admin-dashboard"
-  ]
+  }
 }
