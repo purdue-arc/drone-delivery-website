@@ -12,7 +12,6 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
         // each element in params.route a string like "[40.431545, -86.931237, 200]"
         // make sure each element has lat and long within the bounds
         const validationMessage = validateFlight(params);
-        console.log(validationMessage)
 
         // if valid route, make graphql request to insert
         if (!validationMessage) {
