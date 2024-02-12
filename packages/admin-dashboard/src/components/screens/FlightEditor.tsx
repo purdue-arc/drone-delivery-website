@@ -56,8 +56,9 @@ export default function FlightEditor(props: { points: Cartographic[], pathContro
       <Typography variant="h3">Edit Flight</Typography>
       <Typography>
         Controls:<br />
-        Left drag: move waypoint parallel to ground<br />
-        Alt + Left drag: move waypoint vertically
+        Left click: place waypoint<br />
+        r/f: raise/lower altitude of waypoint<br />
+        Right click: Finish drawing path
       </Typography>
 
       <fieldset>

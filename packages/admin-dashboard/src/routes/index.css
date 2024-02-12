@@ -6,7 +6,8 @@
   overflow: hidden;
 }
 
-.MuiBox-root.css-ekoalo8v {
-  width: 100vw;
-  height: 20vh;
+#altitudeContainer {
+  position: relative;
+  margin-left: 15px;
+  height: 15vh;
 }

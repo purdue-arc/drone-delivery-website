@@ -1,18 +1,18 @@
 import * as Cesium from "cesium";
-import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from "cesium";
-import {createEffect, createSignal, onCleanup, onMount, Show, untrack} from "solid-js";
+import { CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler } from "cesium";
+import { createEffect, createSignal, onCleanup, onMount, Show, untrack } from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import Tooltip from "~/components/tooltips/Tooltip";
 import DroneTooltipContents from "~/components/tooltips/DroneTooltipContents";
 import DronesController from "~/lib/cesium/DronesController";
-import {graphql} from "~/gql";
-import {createSubscription} from "@merged/solid-apollo";
+import { graphql } from "~/gql";
+import { createSubscription } from "@merged/solid-apollo";
 import PathController from "~/lib/cesium/PathController";
-import {addHeight} from "~/lib/cesium/addHeight";
-import {Stack} from "@suid/material";
+import { addHeight } from "~/lib/cesium/addHeight";
+import { Stack } from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
-import {Drone} from "~/lib/cesium/Drone";
+import { Drone } from "~/lib/cesium/Drone";
 import AltitudePathGraph from "~/components/info-fragments/AltitudePath";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
@@ -109,14 +109,14 @@ export default function Home() {
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK,
     );
 
-    viewer.animation.viewModel.timeFormatter = function(julianDate, viewModel) {
+    viewer.animation.viewModel.timeFormatter = function (julianDate, viewModel) {
       // TODO: format the timeline in local time
       const date = Cesium.JulianDate.toDate(julianDate);
       return `LMAO ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     };
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-    handler.setInputAction(function(event: ScreenSpaceEventHandler.PositionedEvent) {
+    handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position);
       if (!isDrawingPath())
         setSelectedDroneId(selectedDrone?.id);
@@ -144,7 +144,7 @@ export default function Home() {
     }
     let lastKnownPosition: Cartesian2 | null = null;
     // Mouse move handler to change the position of the floating point
-    handler.setInputAction(function(event) {
+    handler.setInputAction(function (event) {
       lastKnownPosition = event.endPosition;
       if (Cesium.defined(floatingPoint)) {
         if (!altPressed) {
@@ -162,7 +162,7 @@ export default function Home() {
     }
 
     // End the shape
-    handler.setInputAction(function() {
+    handler.setInputAction(function () {
       if (!isDrawingPath()) return;
       setIsDrawingPath(false);
       terminateShape();
@@ -174,15 +174,16 @@ export default function Home() {
     // modify altitude
     function handleKeyDown(event: KeyboardEvent) {
       // if alt key is pressed
-      if (event.altKey) {
-        setAltitude(altitude() - 10);
+      if (event.key === "f" && altitude() > 0) {
+        setAltitude(altitude() - 1);
         if (lastKnownPosition) {
           const newPosition = viewer.scene.pickPosition(lastKnownPosition);
           updatePosition(newPosition);
         }
-  }
-      if (event.shiftKey)  {
-        setAltitude(altitude() + 10);
+      }
+      // Constrain to 400 ft
+      if (event.key === "r" && altitude() < 120) {
+        setAltitude(altitude() + 1);
         if (lastKnownPosition) {
           const newPosition = viewer.scene.pickPosition(lastKnownPosition);
           updatePosition(newPosition);
@@ -228,9 +229,11 @@ export default function Home() {
           <DroneTooltipContents id={selectedDroneId()!} onStartDrawingPath={startDrawingPath} />
         </Tooltip>
       </Show>
-      <Show when={selectedDroneId() != undefined && flightEditorIsShowing()}>
-        <AltitudePathGraph id={selectedDroneId()!} points={pathController!.waypoints()} />
+      <div id="altitudeContainer" >
+        <Show when={selectedDroneId() != undefined && flightEditorIsShowing()}>
+          <AltitudePathGraph id={selectedDroneId()!} points={pathController!.waypoints()} />
         </Show>
+      </div>
     </main>
   );
 }

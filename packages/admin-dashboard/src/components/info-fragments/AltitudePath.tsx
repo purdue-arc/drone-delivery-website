@@ -83,11 +83,8 @@ export default function AltitudePathGraph(props: {id: number, points: Cartograph
             }],
         },
         options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                },
-            },
+            responsive: true,
+            maintainAspectRatio: false,
         },
     });
     });
@@ -101,11 +98,6 @@ export default function AltitudePathGraph(props: {id: number, points: Cartograph
 
 
     return (
-        // simple heaading that says graph
-        <Box padding={2}>
-            <Typography variant="h3">Graph</Typography>
-            <canvas id="myChart"></canvas>
-
-        </Box>
+        <canvas id="myChart" />
     );
 }
