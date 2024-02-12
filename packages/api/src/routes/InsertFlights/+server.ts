@@ -1,5 +1,5 @@
 import type { RequestEvent, RequestHandler } from './$types';
-import type { InsertFlightsArgs, ValidateOutput } from 'validator/types';
+import type { InsertFlightsArgs } from 'validator/types';
 import { validateFlight } from 'validator/validate';
 import { InsertFlightsStore } from '$houdini';
 
