@@ -2,12 +2,17 @@
   "name": "drone-delivery-website",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel run dev && pnpm --filter validator run build"
+    "dev": "pnpm --parallel run dev && pnpm --filter validator run build",
+    "build": "pnpm --filter validator --filter api run build",
+    "start": "pnpm --filter api run start"
   },
   "gitHooks": {
     "pre-commit": "eslint --ext .tsx,.ts src/"
   },
   "engines": {
     "node": ">=16.8"
-  }
+  },
+  "devDependencies": {
+    "pnpm": "^6.16.1"
+  }  
 }
