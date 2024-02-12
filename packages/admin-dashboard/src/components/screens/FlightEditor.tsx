@@ -1,7 +1,7 @@
 import {Box, Button, IconButton, MenuItem, MenuList, Paper, Popper, Stack, Typography} from "@suid/material";
 import ClickAwayListener from "~/components/generic/ClickAwayListener";
-import ArrowDropUpIcon from '@suid/icons-material/ArrowDropUp';
-import SearchIcon from '@suid/icons-material/Search';
+import ArrowDropUpIcon from "@suid/icons-material/ArrowDropUp";
+import SearchIcon from "@suid/icons-material/Search";
 import {createSignal, For, Show} from "solid-js";
 import type PathController from "~/lib/cesium/PathController";
 import {type Cartographic, Math as CesiumMath} from "cesium";
@@ -34,9 +34,9 @@ export default function FlightEditor(props: { points: Cartographic[], pathContro
   let createNewOrder!: () => void;
 
   const options = [
-    {name: 'Local', onClick: () => props.pathController.simulateLocal()},
-    {name: 'Database', onClick: () => props.pathController.simulateDatabase()},
-    {name: 'Stop', onClick: () => props.pathController.endSimulation()},
+    {name: "Local", onClick: () => props.pathController.simulateLocal()},
+    {name: "Database", onClick: () => props.pathController.simulateDatabase()},
+    {name: "Stop", onClick: () => props.pathController.endSimulation()},
   ];
 
   function submitFlight() {

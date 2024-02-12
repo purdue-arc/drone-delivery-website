@@ -1,4 +1,3 @@
-import {Box, Typography} from "@suid/material";
 import {createEffect, createSignal, onMount} from "solid-js";
 import {graphql} from "~/gql";
 import {createSubscription} from "@merged/solid-apollo";
