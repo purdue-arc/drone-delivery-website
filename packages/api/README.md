@@ -13,7 +13,7 @@ npm run dev
 npm run dev -- --open
 ```
 
-Copy `.env.local.sample` to `.env.local` and add the API auth token.
+Copy `.env.example` to `.env` and add the API auth token.
 
 ## Building
 
