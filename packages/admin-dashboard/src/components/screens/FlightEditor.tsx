@@ -11,14 +11,12 @@ import NewOrderDialog, {OrderSummary} from "~/components/NewOrderDialog";
 import NoteAddIcon from "@suid/icons-material/NoteAdd";
 
 const submitFlightMutation = graphql(`
-mutation InsertFlights($order_id: bigint, $drone_id: bigint, $route: [String!]) {
-  insert_flights(objects: {order_id: $order_id, drone_id: $drone_id, route: $route}) {
-    returning {
-      flight_id
-    }
+mutation InsertFlights($route: [String!], $order_id: bigint, $drone_id: bigint) {
+  InsertFlights(drone_id: $drone_id, order_id: $order_id, route: $route) {
+    flight_id
   }
 }
-`)
+`);
 
 
 /**
@@ -30,7 +28,7 @@ mutation InsertFlights($order_id: bigint, $drone_id: bigint, $route: [String!]) 
 export default function FlightEditor(props: { points: Cartographic[], pathController: PathController, close: () => void }) {
   const [isOpen, setIsOpen] = createSignal(false);
   const [attachedOrder, setAttachedOrder] = createSignal<OrderSummary>();
-  const addFlight = createMutation(submitFlightMutation)[0]
+  const addFlight = createMutation(submitFlightMutation)[0];
   let anchorRef: HTMLButtonElement | undefined;
   // Fn from `NewOrderDialog` that opens a modal
   let createNewOrder!: () => void;

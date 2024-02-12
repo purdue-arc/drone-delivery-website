@@ -1,0 +1,7 @@
+mutation InsertFlights($drone_id: bigint, $order_id: bigint, $route: [String!]) {
+  insert_flights(objects: {drone_id: $drone_id, order_id: $order_id, route: $route}) {
+    returning {
+      flight_id
+    }
+  }
+}
