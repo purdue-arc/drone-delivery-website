@@ -1,16 +1,21 @@
-import type { InsertFlightsArgs, ValidateOutput } from "./types";
+import type { ValidateOutput, CartoDegrees } from "./types";
 
 /**
- * 
+ * Validates a point along a route
+ * @param point point to validate
  */
-export function validateFlight(flightParams: InsertFlightsArgs): ValidateOutput {
-    const success = flightParams.route.every((element: string) => {
-        // eslint-disable-next-line unused-imports/no-unused-vars
-        const [lat, long, alt] = element.slice(1, -1).split(",").map(Number);
+export function validatePoint(point: CartoDegrees): ValidateOutput {
+    const valid = point.latitude >= 40.427919 && point.latitude <= 40.431545 && point.longitude >= -86.931237 && point.longitude <= -86.92643;
+    return valid ? null : "point out of bounds";
+}
 
-        // Restrict to Purdue Gold Intermural Fields
-        return lat >= 40.427919 && lat <= 40.431545 && long >= -86.931237 && long <= -86.92643;
-    });
+/**
+ * Validates the inputed flight params
+ * @param route inputed flight params
+ */
+// in the future, just because all route points are within space doesn't mean that no airspace is violated
+export function validateRoute(route: CartoDegrees[]): ValidateOutput {
+    const success = route.every(validatePoint);
 
     let message: ValidateOutput = null;
 

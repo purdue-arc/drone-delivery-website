@@ -65,6 +65,9 @@ importers:
       undici:
         specifier: ^5.15.1
         version: 5.26.5
+      validator:
+        specifier: workspace:^
+        version: link:../validator
     devDependencies:
       '@graphql-codegen/cli':
         specifier: ^5.0.0

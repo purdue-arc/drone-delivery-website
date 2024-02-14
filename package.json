@@ -2,7 +2,7 @@
   "name": "drone-delivery-website",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel run dev && pnpm --filter validator run build",
+    "dev": "pnpm --filter validator run build && pnpm --parallel run dev",
     "build": "pnpm --filter validator --filter api run build",
     "start": "pnpm --filter api run start"
   },

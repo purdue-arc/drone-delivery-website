@@ -14,6 +14,8 @@ import { Stack } from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
 import { Drone } from "~/lib/cesium/Drone";
 import AltitudePathGraph from "~/components/info-fragments/AltitudePath";
+import { validatePoint } from "validator/validate";
+import { CartoDegrees } from "validator/types";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
@@ -61,6 +63,15 @@ export default function Home() {
     const dronePos = selectedDrone.position;
     // Create the first floating point
     floatingPoint = pathController.extendPath(dronePos);
+  }
+
+  function cartesiumToDegrees(cartesian: Cesium.Cartesian3): CartoDegrees {
+    const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    return {
+      latitude: Cesium.Math.toDegrees(cartographic.latitude),
+      longitude: Cesium.Math.toDegrees(cartographic.longitude),
+      altitude: cartographic.height,
+    };
   }
 
   onMount(() => {
@@ -126,12 +137,25 @@ export default function Home() {
       // Use `floatingPoint.position` instead of `viewer.scene.pickPosition` b/c `pickPosition` adds extra height if mouse overlapping path entity
       // Note: clicking on top of a drone or photogrammetry terrain will add extra height, but I view this as ok
       const earthPosition = floatingPoint?.position?.getValue(new Cesium.JulianDate()) as Cartesian3;
+
       // `earthPosition` will be undefined if our mouse is not over the globe.
       if (Cesium.defined(earthPosition)) {
-        // Create another point that's permanent (inside extendPath)
-        pathController.extendPath(addHeight(earthPosition, altitude()));
+        // Add the height to the point
+        const trueCartesianPoint = addHeight(earthPosition, altitude());
+
+        const trueCartoPointDegrees = cartesiumToDegrees(trueCartesianPoint);
+
+        const validationMessage = validatePoint(trueCartoPointDegrees);
+
+        if (!validationMessage) {
+          // Create another point that's permanent (inside extendPath)
+          pathController.extendPath(trueCartesianPoint);
+        } else {
+          alert(validationMessage);
+        }
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
     function updatePosition(newPosition: Cesium.Cartesian3) {
       if (Cesium.defined(floatingPoint)) {
         if (!altPressed) {
@@ -201,7 +225,8 @@ export default function Home() {
     );
     viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
 
-    var tileset = viewer.scene.primitives.add(
+    // Add WALC area 3D model
+    viewer.scene.primitives.add(
       new Cesium.Cesium3DTileset({
         url: Cesium.IonResource.fromAssetId(1608724),
       }),
