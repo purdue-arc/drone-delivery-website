@@ -1,7 +1,7 @@
-import type { RequestEvent, RequestHandler } from './$types';
-import type { CartoDegrees, InsertFlightsArgs } from 'validator/types';
-import { validateRoute } from 'validator/validate';
-import { InsertFlightsStore, type InsertFlights$result } from '$houdini';
+import type {RequestEvent, RequestHandler} from './$types';
+import type {CartoDegrees, InsertFlightsArgs} from 'validator/types';
+import {validateRoute} from 'validator/validate';
+import {type InsertFlights$result, InsertFlightsStore} from '$houdini';
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
     const { body, status } = await InsertFlights(event);
@@ -30,12 +30,12 @@ async function InsertFlights(event: RequestEvent): Promise<HasruaErrorResponse |
         const params: InsertFlightsArgs = (await request.json()).input;
 
         const route: CartoDegrees[] = params.route.map((point) => {
-            const [lat, long, alt] = point.slice(1, -1).split(",").map(Number);
-            return { latitude: lat, longitude: long, altitude: alt };
-        })
+            const [latitude, longitude, altitude] = JSON.parse(point);
+            return {latitude, longitude, altitude};
+        });
 
         // each element in params.route a string like "[40.431545, -86.931237, 200]"
-        // make sure each element has lat and long within the bounds        
+        // make sure each element has lat and long within the bounds
         const validationMessage = validateRoute(route);
 
         // if valid route, make graphql request to insert

@@ -8,6 +8,7 @@ netlify
 
 # Generated Files
 **/vite.config.ts.timestamp*
+**/schema.graphql
 
 # dependencies
 **/node_modules
