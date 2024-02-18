@@ -1,10 +1,10 @@
 import type {Cartesian3, Entity, EntityCollection} from "cesium";
 import * as Cesium from "cesium";
 import {graphql} from "~/gql";
-import {createQuery} from "@merged/solid-apollo";
+import {createLazyQuery} from "@merged/solid-apollo";
 
 const droneHistoryQuery = graphql(`
-  query DroneHistory($id: bigint!, $limit: Int) {
+  query DroneHistory($id: bigint, $limit: Int) {
     drone_telemetry(where: {drone_id: {_eq: $id}}, order_by: {timestamp: desc}, limit: $limit) {
       altitude
       heading
@@ -26,24 +26,26 @@ export class HistoricPathRenderer {
     // TODO: implement this as a deque for max efficiency
   private readonly history = [] as Entity[];
 
+  private readonly runHistoryQuery;
+
   /**
    * Display a few dots for the historical path of the drone
    * @param entities likely `viewer.entities` to add dots to
    * @param droneId id of drone owner
    */
   constructor(private readonly entities: EntityCollection, private readonly droneId: number) {
-    this.color = Cesium.Color.fromRandom({ alpha: 1.0 })
+    this.color = Cesium.Color.fromRandom({ alpha: 1.0 });
+    this.runHistoryQuery = createLazyQuery(droneHistoryQuery, {
+      variables: {
+        id: this.droneId
+      }
+    })[0];
     this.fetchHistory(this.historyLimit).then(history => history.forEach(pt => this.addWaypoint(pt)));
   }
 
   /** Fetch the specified number of historical points and convert to Cartesian3 */
   private async fetchHistory(limit: number) {
-    const history = createQuery(droneHistoryQuery, {
-      variables: {
-        id: this.droneId, limit
-    } });
-    // TODO: history() is initially undefined
-    return history().drone_telemetry.map(point => Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude, point.altitude));
+    return (await this.runHistoryQuery({variables: {limit}})).drone_telemetry.map(point => Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude, point.altitude));
   }
 
   addWaypoint(position: Cartesian3) {
@@ -57,11 +59,6 @@ export class HistoricPathRenderer {
         },
       })
     );
-    for (let ptIdx = 2; ptIdx <= Math.min(this.historyLimit, this.history.length); ptIdx++) {
-      const entity = this.history.at(-1 * ptIdx)!;
-      const opacityLimit = this.historyLimit * 2;
-      entity.point!.color = Cesium.Color.fromAlpha(entity.point!.color!.getValue(new Cesium.JulianDate()), (opacityLimit - ptIdx - 1) / opacityLimit);
-    }
     if (this.history.length > this.historyLimit)
       console.log(this.entities.remove(this.history.shift()!));
   }
