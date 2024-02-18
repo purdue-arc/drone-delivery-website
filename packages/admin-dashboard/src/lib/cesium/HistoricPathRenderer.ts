@@ -1,5 +1,19 @@
 import type {Cartesian3, Entity, EntityCollection} from "cesium";
 import * as Cesium from "cesium";
+import {graphql} from "~/gql";
+import {createQuery} from "@merged/solid-apollo";
+
+const droneHistoryQuery = graphql(`
+  query DroneHistory($id: bigint!, $limit: Int) {
+    drone_telemetry(where: {drone_id: {_eq: $id}}, order_by: {timestamp: desc}, limit: $limit) {
+      altitude
+      heading
+      latitude
+      longitude
+      timestamp
+    }
+  }
+`);
 
 export class HistoricPathRenderer {
   /** Color used to render this drone's path */
@@ -12,9 +26,24 @@ export class HistoricPathRenderer {
     // TODO: implement this as a deque for max efficiency
   private readonly history = [] as Entity[];
 
-  constructor(private readonly entities: EntityCollection) {
+  /**
+   * Display a few dots for the historical path of the drone
+   * @param entities likely `viewer.entities` to add dots to
+   * @param droneId id of drone owner
+   */
+  constructor(private readonly entities: EntityCollection, private readonly droneId: number) {
     this.color = Cesium.Color.fromRandom({ alpha: 1.0 })
-    // TODO: make one-time db request to fetch some old data points
+    this.fetchHistory(this.historyLimit).then(history => history.forEach(pt => this.addWaypoint(pt)));
+  }
+
+  /** Fetch the specified number of historical points and convert to Cartesian3 */
+  private async fetchHistory(limit: number) {
+    const history = createQuery(droneHistoryQuery, {
+      variables: {
+        id: this.droneId, limit
+    } });
+    // TODO: history() is initially undefined
+    return history().drone_telemetry.map(point => Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude, point.altitude));
   }
 
   addWaypoint(position: Cartesian3) {
@@ -35,5 +64,13 @@ export class HistoricPathRenderer {
     }
     if (this.history.length > this.historyLimit)
       console.log(this.entities.remove(this.history.shift()!));
+  }
+
+  showFullHistory() {
+    // Show last 30 points
+  }
+
+  hideFullHistory() {
+
   }
 }

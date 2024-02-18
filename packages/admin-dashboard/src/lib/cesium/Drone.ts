@@ -15,6 +15,7 @@ export class Drone {
    * Wrapper around Cesium.Entity for Drones
    * @param entity Drone Entity to wrap
    * @param clock Clock instance for Viewer which this Drone belongs. Used for getting position
+   * @param historicPathRenderer object that will render the historic path of this drone
    */
   constructor(private readonly entity: Entity, private readonly clock: Clock, private readonly historicPathRenderer?: HistoricPathRenderer) {
   }

@@ -1,0 +1,2 @@
+schema: src/gql/schema.graphql
+documents: '**/*.ts?(x)'
