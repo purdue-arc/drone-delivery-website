@@ -2,9 +2,10 @@
   "name": "drone-delivery-website",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter validator run build && pnpm --parallel run dev",
-    "build": "pnpm --filter validator --filter api run build",
-    "start": "pnpm --filter api run start"
+    "dev": "npm run build --workspace=validator && npm run dev --workspaces --if-present",
+    "build": "npm run build --workspace=validator --workspace=api",
+    "start": "npm run start --workspace=api",
+    "postinstall": "symlink-dir node_modules/cesium packages/admin-dashboard/node_modules/cesium"
   },
   "gitHooks": {
     "pre-commit": "eslint --ext .tsx,.ts src/"
@@ -12,7 +13,11 @@
   "engines": {
     "node": ">=16.8"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
-    "pnpm": "^6.16.1"
-  }  
+    "pnpm": "^6.16.1",
+    "symlink-dir": "^5.2.1"
+  }
 }
