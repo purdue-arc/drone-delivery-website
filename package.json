@@ -17,6 +17,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@parcel/watcher": "^2.4.0",
     "pnpm": "^6.16.1",
     "symlink-dir": "^5.2.1"
   }
