@@ -52,6 +52,17 @@ and then fill in the access token variable (no quotes surrounding the token).
 
 Run `npm install` to get the latest packages and `npm run dev` to start the app.
 
+**App will not run under other package managers besides npm.**
+
+<details>
+<summary>Why?</summary>
+<ul>
+    <li>pnpm: Graphql codegen types are incorrect (reporting generic object)</li>
+    <li>yarn: React is not defined (likely from migrating `package-lock.json` to `yarn.lock`. Oddly, it worked until I applied monorepo change)</li>
+    <li>npm: Initially, wasn't able to find Cesium assets, hence I tried pnpm & yarn. Workaround: postinstall script symlinks</li>
+</ul>
+</details>
+
 ## Building
 
 Solid apps are built with _adapters_, which optimise your project for deployment to different environments.
