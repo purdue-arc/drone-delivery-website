@@ -1,21 +1,21 @@
 import * as Cesium from "cesium";
-import { CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler } from "cesium";
-import { createEffect, createSignal, onCleanup, onMount, Show, untrack } from "solid-js";
+import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from "cesium";
+import {createEffect, createSignal, onCleanup, onMount, Show, untrack} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import Tooltip from "~/components/tooltips/Tooltip";
 import DroneTooltipContents from "~/components/tooltips/DroneTooltipContents";
 import DronesController from "~/lib/cesium/DronesController";
-import { graphql } from "~/gql";
-import { createSubscription } from "@merged/solid-apollo";
+import {graphql} from "~/gql";
+import {createSubscription} from "@merged/solid-apollo";
 import PathController from "~/lib/cesium/PathController";
-import { addHeight } from "~/lib/cesium/addHeight";
-import { Stack } from "@suid/material";
+import {addHeight} from "~/lib/cesium/addHeight";
+import {Stack} from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
-import { Drone } from "~/lib/cesium/Drone";
+import {Drone} from "~/lib/cesium/Drone";
 import AltitudePathGraph from "~/components/info-fragments/AltitudePath";
-import { validatePoint } from "validator/validate";
-import { CartoDegrees } from "validator/types";
+import {validatePoint} from "validator/validate";
+import {CartoDegrees} from "validator/types";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
@@ -129,8 +129,13 @@ export default function Home() {
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (event: ScreenSpaceEventHandler.PositionedEvent) {
       const [selectedDrone, stateChanged] = dronesController.tryPickDrone(event.position);
-      if (!isDrawingPath())
+      if (!isDrawingPath()) {
+        if (selectedDrone?.id)
+          drones[selectedDrone.id].select();
+        else
+          drones[selectedDroneId()!].deselect();
         setSelectedDroneId(selectedDrone?.id);
+      }
       if ((stateChanged && !isDrawingPath()) || !isDrawingPath()) {
         return;
       }

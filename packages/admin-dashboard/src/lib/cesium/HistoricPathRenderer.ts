@@ -22,11 +22,21 @@ export class HistoricPathRenderer {
   /** Limit on number of historic position points to show when drone unselected */
   private readonly historyLimit = 6;
 
-  /** Record of where this drone has been since startup */
+  /** Limit on number of historic position points to show when drone selected */
+  private readonly fullHistoryLimit = 30;
+
+  /** Entities corresponding to the previous drone waypoints. Max length `historyLimit` or `fullHistoryLimit` depending on whether full history is showing */
     // TODO: implement this as a deque for max efficiency
   private readonly history = [] as Entity[];
 
+  /** Lazy Apollo query to fetch drone history */
   private readonly runHistoryQuery;
+
+  /** Entity corresponding to sky polyline */
+  private shouldShowFull = false;
+
+  /** Property for rendering sky polyline positions */
+  private positionProp = new Cesium.CallbackProperty(this.cvtHistoryPoints.bind(this), false);
 
   /**
    * Display a few dots for the historical path of the drone
@@ -40,6 +50,16 @@ export class HistoricPathRenderer {
         id: this.droneId
       }
     })[0];
+    this.entities.add({
+      polyline: {
+        positions: this.positionProp,
+        width: 3,
+        material: new Cesium.PolylineOutlineMaterialProperty({
+          outlineColor: this.color,
+          color: this.color,
+        }),
+      },
+    });
     this.fetchHistory(this.historyLimit).then(history => history.forEach(pt => this.addWaypoint(pt)));
   }
 
@@ -48,8 +68,13 @@ export class HistoricPathRenderer {
     return (await this.runHistoryQuery({variables: {limit}})).drone_telemetry.map(point => Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude, point.altitude));
   }
 
-  addWaypoint(position: Cartesian3) {
-    this.history.push(
+  /** Convert history entities to Cartesian3 */
+  private cvtHistoryPoints() {
+    return this.history.map(e => e.position!.getValue(new Cesium.JulianDate()) as Cartesian3);
+  }
+
+  addWaypoint(position: Cartesian3, atStart = false) {
+    this.history[atStart ? "unshift" : "push"](
       this.entities.add({
         position,
         point: {
@@ -59,15 +84,20 @@ export class HistoricPathRenderer {
         },
       })
     );
-    if (this.history.length > this.historyLimit)
+    if (this.history.length > (this.shouldShowFull ? this.fullHistoryLimit : this.historyLimit))
       console.log(this.entities.remove(this.history.shift()!));
   }
 
+  /** Show previous `fullHistoryLimit` waypoints & extend line */
   showFullHistory() {
-    // Show last 30 points
+    this.shouldShowFull = true;
+    this.fetchHistory(this.fullHistoryLimit).then(history => history.forEach(pt => this.addWaypoint(pt, true)));
   }
 
+  /** Remove waypoints up to `historyLimit` & shorten line */
   hideFullHistory() {
-
+    this.shouldShowFull = false;
+    while (this.history.length > this.historyLimit)
+      this.entities.remove(this.history.shift()!);
   }
 }

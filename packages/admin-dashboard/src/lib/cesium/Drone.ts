@@ -61,6 +61,14 @@ export class Drone {
     return this;
   }
 
+  select() {
+    this.historicPathRenderer?.showFullHistory();
+  }
+
+  deselect() {
+    this.historicPathRenderer?.hideFullHistory();
+  }
+
   /**
    * Gets custom properties for a Drone at the current time as the correct type
    */
