@@ -9,7 +9,7 @@ subscription GetDrones {
   drone_telemetry(distinct_on: drone_id, order_by: {timestamp: desc, drone_id: asc}) {
     drone_id
     has_package
-    altitude
+    # altitude
     battery
     timestamp
   }

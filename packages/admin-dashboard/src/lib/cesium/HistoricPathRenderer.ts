@@ -6,10 +6,8 @@ import {createQuery} from "@merged/solid-apollo";
 const droneHistoryQuery = graphql(`
   query DroneHistory($id: bigint!, $limit: Int) {
     drone_telemetry(where: {drone_id: {_eq: $id}}, order_by: {timestamp: desc}, limit: $limit) {
-      altitude
-      heading
-      latitude
-      longitude
+      heading   
+      position
       timestamp
     }
   }
@@ -40,10 +38,11 @@ export class HistoricPathRenderer {
   private async fetchHistory(limit: number) {
     const history = createQuery(droneHistoryQuery, {
       variables: {
-        id: this.droneId, limit
+        id: this.droneId, limit,
     } });
     // TODO: history() is initially undefined
-    return history().drone_telemetry.map(point => Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude, point.altitude));
+    if (!history()) return [];
+    return history()?.drone_telemetry?.map(point => Cesium.Cartesian3.fromDegrees(point.position.coordinates[0], point.position.coordinates[1], point.position.coordinates[2])) ?? [];
   }
 
   addWaypoint(position: Cartesian3) {

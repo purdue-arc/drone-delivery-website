@@ -87,7 +87,7 @@ export default class DronesController {
         position: positionProp,
       } satisfies Entity.ConstructorOptions), this.viewer.clock, new HistoricPathRenderer(this.viewer.entities, id))
       .setPos(
-        longitude, latitude, height, heading,
+        latitude, longitude, height, heading,
       );
   }
 }

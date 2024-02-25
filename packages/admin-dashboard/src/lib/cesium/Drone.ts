@@ -21,7 +21,7 @@ export class Drone {
   }
 
   get position() {
-    return this.entity.position!.getValue(this.clock.currentTime) as Cartesian3
+    return this.entity.position!.getValue(this.clock.currentTime) as Cartesian3;
   }
 
   get id() {
@@ -41,7 +41,8 @@ export class Drone {
    * @param time when was the drone at this position? Defaults to current timeline position
    * @see addDrone
    */
-  setPos(longitude: number, latitude: number, height: number, heading: number, time = this.clock.currentTime) {
+  setPos(latitude: number, longitude: number, height: number, heading: number, time = this.clock.currentTime) {
+    debugger;
     // Cesium uses WGS84 reference ellipsoid (https://epsg.org/ellipsoid_7030/WGS-84.html), same as GPS (https://community.cesium.com/t/get-heighy-value/23064/2)
     // See https://www.unavco.org/education/resources/tutorials-and-handouts/tutorials/geoid-gps-receivers.html for more info on how GPS works
     // Avg height of Purdue is 190m. Cesium renders terrain at the correct height. Check specific height: https://www.daftlogic.com/projects-find-elevation-on-map.htm
@@ -65,6 +66,7 @@ export class Drone {
    * Gets custom properties for a Drone at the current time as the correct type
    */
   getProps() {
+    console.log("hi");
     console.log(this.entity?.properties?.id);
     return this.entity.properties!.getValue(new Cesium.JulianDate()) as DroneProperties;
   }

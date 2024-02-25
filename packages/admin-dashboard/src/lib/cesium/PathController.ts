@@ -10,8 +10,8 @@ import {Accessor, createSignal, Setter} from "solid-js";
 
 
 const simulateTelemetryMutation = graphql(`
-    mutation SimulateTelemetry($drone_id: bigint, $altitude: float8, $latitude: float8, $longitude: float8, $heading: float8, $timestamp: bigint) {
-        insert_drone_telemetry_one(object: {altitude: $altitude, drone_id: $drone_id, battery: "50", has_package: false, heading: $heading, latitude: $latitude, longitude: $longitude, stage_of_flight: "repositioning", timestamp: $timestamp}) {
+    mutation SimulateTelemetry($drone_id: bigint, $heading: float8, $timestamp: bigint, #latitude: float8, #longitude: float8, #altitude: float8) {
+        insert_drone_telemetry_one(object: {drone_id: $drone_id, battery: "50", has_package: false, heading: $heading,, timestamp: $timestamp, position: {"type": "Point", "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::4326" } }, "coordinates": [ 1, 2, 0 ] } }) {
             id
         }
     }

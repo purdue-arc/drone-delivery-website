@@ -24,10 +24,8 @@ const dronesPosQuery = graphql(`
         drone_telemetry(distinct_on: drone_id, order_by: {timestamp: desc, drone_id: asc}) {
             id: drone_id
             heading
-            latitude
-            longitude
-            altitude
             timestamp
+            position
         }
     }
 `);
@@ -95,12 +93,15 @@ export default function Home() {
 
     // Update or add all drone positions
     createEffect(() => {
+      console.log("drone pos");
       console.log(dronesPos());
       for (const drone of dronesPos()?.drone_telemetry ?? []) {
         if (drone.id in drones) {
-          drones[drone.id].setPos(drone.longitude, drone.latitude, drone.altitude, drone.heading, Cesium.JulianDate.fromDate(new Date(drone.timestamp)));
+          console.log("updating drone");
+          drones[drone.id].setPos(40.427546, -86.913785, 200, drone.heading, Cesium.JulianDate.fromDate(new Date(drone.timestamp)));
         } else {
-          drones[drone.id] = dronesController.addDrone(drone.id, drone.longitude, drone.latitude, drone.altitude, drone.heading);
+          console.log("adding drone");
+          drones[drone.id] = dronesController.addDrone(drone.id, 40.427546, -86.913785, 200, drone.heading);
         }
       }
     });
@@ -256,7 +257,7 @@ export default function Home() {
       </Show>
       <div id="altitudeContainer" >
         <Show when={selectedDroneId() != undefined && flightEditorIsShowing()}>
-          <AltitudePathGraph id={selectedDroneId()!} points={pathController!.waypoints()} />
+          {/* <AltitudePathGraph id={selectedDroneId()!} points={pathController!.waypoints()} /> */}
         </Show>
       </div>
     </main>
