@@ -42,7 +42,6 @@ export class Drone {
    * @see addDrone
    */
   setPos(latitude: number, longitude: number, height: number, heading: number, time = this.clock.currentTime) {
-    debugger;
     // Cesium uses WGS84 reference ellipsoid (https://epsg.org/ellipsoid_7030/WGS-84.html), same as GPS (https://community.cesium.com/t/get-heighy-value/23064/2)
     // See https://www.unavco.org/education/resources/tutorials-and-handouts/tutorials/geoid-gps-receivers.html for more info on how GPS works
     // Avg height of Purdue is 190m. Cesium renders terrain at the correct height. Check specific height: https://www.daftlogic.com/projects-find-elevation-on-map.htm

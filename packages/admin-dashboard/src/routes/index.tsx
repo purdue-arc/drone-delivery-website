@@ -1,21 +1,20 @@
 import * as Cesium from "cesium";
-import { CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler } from "cesium";
-import { createEffect, createSignal, onCleanup, onMount, Show, untrack } from "solid-js";
+import {CameraEventType, Cartesian2, Cartesian3, type ScreenSpaceEventHandler} from "cesium";
+import {createEffect, createSignal, onCleanup, onMount, Show, untrack} from "solid-js";
 import "./index.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import Tooltip from "~/components/tooltips/Tooltip";
 import DroneTooltipContents from "~/components/tooltips/DroneTooltipContents";
 import DronesController from "~/lib/cesium/DronesController";
-import { graphql } from "~/gql";
-import { createSubscription } from "@merged/solid-apollo";
+import {graphql} from "~/gql";
+import {createSubscription} from "@merged/solid-apollo";
 import PathController from "~/lib/cesium/PathController";
-import { addHeight } from "~/lib/cesium/addHeight";
-import { Stack } from "@suid/material";
+import {addHeight} from "~/lib/cesium/addHeight";
+import {Stack} from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
-import { Drone } from "~/lib/cesium/Drone";
-import AltitudePathGraph from "~/components/info-fragments/AltitudePath";
-import { validatePoint } from "validator/validate";
-import { CartoDegrees } from "validator/types";
+import {Drone} from "~/lib/cesium/Drone";
+import {validatePoint} from "validator/validate";
+import {CartoDegrees} from "validator/types";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
 
@@ -93,15 +92,12 @@ export default function Home() {
 
     // Update or add all drone positions
     createEffect(() => {
-      console.log("drone pos");
-      console.log(dronesPos());
       for (const drone of dronesPos()?.drone_telemetry ?? []) {
+        const coords = drone.position.coordinates;
         if (drone.id in drones) {
-          console.log("updating drone");
-          drones[drone.id].setPos(40.427546, -86.913785, 200, drone.heading, Cesium.JulianDate.fromDate(new Date(drone.timestamp)));
+          drones[drone.id].setPos(...coords, drone.heading, Cesium.JulianDate.fromDate(new Date(drone.timestamp)));
         } else {
-          console.log("adding drone");
-          drones[drone.id] = dronesController.addDrone(drone.id, 40.427546, -86.913785, 200, drone.heading);
+          drones[drone.id] = dronesController.addDrone(drone.id, ...coords, drone.heading);
         }
       }
     });
