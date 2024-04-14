@@ -73,7 +73,6 @@ export class Drone {
    * Gets custom properties for a Drone at the current time as the correct type
    */
   getProps() {
-    console.log("hi");
     console.log(this.entity?.properties?.id);
     return this.entity.properties!.getValue(new Cesium.JulianDate()) as DroneProperties;
   }

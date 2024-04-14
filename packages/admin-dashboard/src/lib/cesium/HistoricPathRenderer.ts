@@ -66,8 +66,8 @@ export class HistoricPathRenderer {
     return (await this.runHistoryQuery({variables: {limit}}))
       .drone_telemetry.map(point =>
         Cesium.Cartesian3.fromDegrees(
-          point.position.coordinates[0],
           point.position.coordinates[1],
+          point.position.coordinates[0],
           point.position.coordinates[2]
         )
       );
