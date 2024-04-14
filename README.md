@@ -86,9 +86,6 @@ By default, `npm run build` will generate a Node app that you can run with `npm 
 6. Vite: Build tool
 
 ## Monorepo architecture
-- validator
-- api: Accepts requests from Hasura Actions, validates their contents, then performs database queries through re-requesting the Hasura GraphQL endpoint
-  - validator
 - admin-dashboard: our frontend website
   - validator (perform client-side validation before we make Hasura Action requests)
   - Nhost Auth 

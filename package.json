@@ -2,9 +2,8 @@
   "name": "drone-delivery-website",
   "private": true,
   "scripts": {
-    "dev": "npm-run-all --parallel dev-admin dev-api",
-    "dev-admin": "npm run dev --workspace=admin-dashboard",
-    "dev-api": "npm run dev --workspace=api",
+    "dev": "npm-run-all --parallel dev:admin",
+    "dev:admin": "npm run dev --workspace=admin-dashboard",
     "build": "npm run build --workspace=validator --workspace=api",
     "api": "npm install && npm run start --workspace=api",
     "postinstall": "symlink-dir node_modules/cesium packages/admin-dashboard/node_modules/cesium"

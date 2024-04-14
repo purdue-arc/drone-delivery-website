@@ -11,10 +11,12 @@ import NewOrderDialog, {OrderSummary} from "~/components/NewOrderDialog";
 import NoteAddIcon from "@suid/icons-material/NoteAdd";
 
 const submitFlightMutation = graphql(`
-mutation InsertFlights($route: [String!], $order_id: bigint, $drone_id: bigint) {
-  InsertFlights(drone_id: $drone_id, order_id: $order_id, route: $route) {
-    flight_id
-  }
+mutation InsertFlights($drone_id: bigint, $order_id: bigint, $route: [String!] = "") {
+    insert_flights(objects: {drone_id: $drone_id, order_id: $order_id, route: $route}) {
+        returning {
+            flight_id
+        }
+    }
 }
 `);
 

@@ -13,7 +13,7 @@ import {addHeight} from "~/lib/cesium/addHeight";
 import {Stack} from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
 import {Drone} from "~/lib/cesium/Drone";
-import {validatePoint} from "validator/validate";
+import {validatePoint} from "~/lib/validator";
 import {CartoDegrees} from "validator/types";
 
 const CESSIUM_ACCESS_TOKEN = import.meta.env["VITE_CESSIUM_ACCESS_TOKEN"];
@@ -145,9 +145,7 @@ export default function Home() {
         // Add the height to the point
         const trueCartesianPoint = addHeight(earthPosition, altitude());
 
-        const trueCartoPointDegrees = cartesiumToDegrees(trueCartesianPoint);
-
-        const validationMessage = validatePoint(trueCartoPointDegrees);
+        const validationMessage = validatePoint(cartesiumToDegrees(trueCartesianPoint));
 
         if (!validationMessage) {
           // Create another point that's permanent (inside extendPath)
