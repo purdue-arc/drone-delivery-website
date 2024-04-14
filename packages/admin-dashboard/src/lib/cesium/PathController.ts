@@ -10,8 +10,8 @@ import {Accessor, createSignal, Setter} from "solid-js";
 
 
 const simulateTelemetryMutation = graphql(`
-    mutation SimulateTelemetry($drone_id: bigint, $heading: float8, $timestamp: bigint, #latitude: float8, #longitude: float8, #altitude: float8) {
-        insert_drone_telemetry_one(object: {drone_id: $drone_id, battery: "50", has_package: false, heading: $heading,, timestamp: $timestamp, position: {"type": "Point", "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::4326" } }, "coordinates": [ 1, 2, 0 ] } }) {
+    mutation SimulateTelemetry($drone_id: bigint, $heading: float8, $timestamp: bigint, $position: geography) {
+        insert_drone_telemetry_one(object: {drone_id: $drone_id, battery: "50", has_package: false, heading: $heading, timestamp: $timestamp, position: $position}) {
             id
         }
     }
@@ -194,10 +194,14 @@ export default class PathController {
         Cesium.HeadingPitchRoll.fromQuaternion(
           this.skyPathEntity!.orientation!.getValue(this.viewer.clock.currentTime) as Cesium.Quaternion
         ).heading * Cesium.Math.DEGREES_PER_RADIAN + 90,
-      // Add 90 b/c Drone.setPos expects angle where 0 = North, but fromQuaternion returns angle where 0 = right
-      longitude: Cesium.Math.toDegrees(gps.longitude),
-      latitude: Cesium.Math.toDegrees(gps.latitude),
-      altitude: gps.height,
+      position: {
+        "type": "Point",
+        "coordinates": [
+          Cesium.Math.toDegrees(gps.latitude),
+          Cesium.Math.toDegrees(gps.longitude),
+          gps.height
+        ],
+      },
       drone_id: this.drone.id,
       timestamp: Cesium.JulianDate.toDate(this.viewer.clock.currentTime).getTime(),
     }});
