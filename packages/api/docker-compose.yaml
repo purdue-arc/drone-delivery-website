@@ -7,5 +7,5 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./:/app
-    command: sh -c "npm install && npx houdini pull-schema && npm run start"
+      - ../../:/app
+    command: sh -c "npm run api"
