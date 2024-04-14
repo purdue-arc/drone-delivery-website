@@ -6,10 +6,8 @@ import {createLazyQuery} from "@merged/solid-apollo";
 const droneHistoryQuery = graphql(`
   query DroneHistory($id: bigint, $limit: Int) {
     drone_telemetry(where: {drone_id: {_eq: $id}}, order_by: {timestamp: desc}, limit: $limit) {
-      altitude
-      heading
-      latitude
-      longitude
+      heading   
+      position
       timestamp
     }
   }

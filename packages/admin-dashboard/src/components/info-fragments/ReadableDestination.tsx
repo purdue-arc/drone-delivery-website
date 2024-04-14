@@ -7,7 +7,7 @@ const destinationQuery = graphql(`
     subscription DroneDestination($droneId: bigint!) {
         me: drones_by_pk(drone_id: $droneId) {
             telemetry: drone_telemetries(limit: 1, order_by: {timestamp: desc}) {
-                stage_of_flight
+                # stage_of_flight
                 has_package
             }
             flights(limit: 1, order_by: {flight_id: desc}) {

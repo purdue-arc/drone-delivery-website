@@ -13,7 +13,6 @@ import {addHeight} from "~/lib/cesium/addHeight";
 import {Stack} from "@suid/material";
 import FlightEditor from "~/components/screens/FlightEditor";
 import {Drone} from "~/lib/cesium/Drone";
-import AltitudePathGraph from "~/components/info-fragments/AltitudePath";
 import {validatePoint} from "validator/validate";
 import {CartoDegrees} from "validator/types";
 
@@ -24,10 +23,8 @@ const dronesPosQuery = graphql(`
         drone_telemetry(distinct_on: drone_id, order_by: {timestamp: desc, drone_id: asc}) {
             id: drone_id
             heading
-            latitude
-            longitude
-            altitude
             timestamp
+            position
         }
     }
 `);
@@ -95,12 +92,12 @@ export default function Home() {
 
     // Update or add all drone positions
     createEffect(() => {
-      console.log(dronesPos());
       for (const drone of dronesPos()?.drone_telemetry ?? []) {
+        const coords = drone.position.coordinates;
         if (drone.id in drones) {
-          drones[drone.id].setPos(drone.longitude, drone.latitude, drone.altitude, drone.heading, Cesium.JulianDate.fromDate(new Date(drone.timestamp)));
+          drones[drone.id].setPos(...coords, drone.heading, Cesium.JulianDate.fromDate(new Date(drone.timestamp)));
         } else {
-          drones[drone.id] = dronesController.addDrone(drone.id, drone.longitude, drone.latitude, drone.altitude, drone.heading);
+          drones[drone.id] = dronesController.addDrone(drone.id, ...coords, drone.heading);
         }
       }
     });
@@ -261,7 +258,7 @@ export default function Home() {
       </Show>
       <div id="altitudeContainer" >
         <Show when={selectedDroneId() != undefined && flightEditorIsShowing()}>
-          <AltitudePathGraph id={selectedDroneId()!} points={pathController!.waypoints()} />
+          {/* <AltitudePathGraph id={selectedDroneId()!} points={pathController!.waypoints()} /> */}
         </Show>
       </div>
     </main>

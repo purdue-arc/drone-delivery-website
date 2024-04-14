@@ -17,11 +17,11 @@ const statusQuery = graphql(`
     subscription DroneInfo($droneId: bigint!) {
         me: drones_by_pk(drone_id: $droneId) {
             telemetry: drone_telemetries(limit: 1, order_by: {timestamp: desc}) {
-                altitude
+                # altitude
                 battery
                 heading
-                latitude
-                longitude
+                # latitude
+                # longitude
                 velocity
             }
             flights(limit: 1, order_by: {flight_id: desc}) {

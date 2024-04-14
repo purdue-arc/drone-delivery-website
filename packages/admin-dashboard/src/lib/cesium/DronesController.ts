@@ -76,7 +76,7 @@ export default class DronesController {
    * @param heading compass direction (deg) to point in. 0 is north, increase clockwise
    * @see https://sandcastle.cesium.com/?src=3D%20Models.html
    */
-  addDrone(id: number, longitude: number, latitude: number, height: number, heading: number) {
+  addDrone(id: number, latitude: number, longitude: number, height: number, heading: number) {
     // TODO: ignore scene lighting, hard to see at night
     const positionProp = new Cesium.SampledPositionProperty();
     positionProp.forwardExtrapolationType = Cesium.ExtrapolationType.HOLD;
@@ -87,7 +87,7 @@ export default class DronesController {
         position: positionProp,
       } satisfies Entity.ConstructorOptions), this.viewer.clock, new HistoricPathRenderer(this.viewer.entities, id))
       .setPos(
-        longitude, latitude, height, heading,
+        latitude, longitude, height, heading,
       );
   }
 }

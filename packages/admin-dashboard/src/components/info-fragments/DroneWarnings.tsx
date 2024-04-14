@@ -9,7 +9,7 @@ const warningsQuery = graphql(`
         me: drones_by_pk(drone_id: $droneId) {
             telemetry: drone_telemetries(limit: 1, order_by: {timestamp: desc}) {
                 battery
-                stage_of_flight
+                # stage_of_flight
                 timestamp
             }
             flights(limit: 1, order_by: {flight_id: desc}) {
