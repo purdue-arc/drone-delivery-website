@@ -2,7 +2,6 @@
   "name": "drone-delivery-website",
   "private": true,
   "scripts": {
-    "dev": "npm run build --workspace=validator && npm run dev --workspaces --if-present",
     "build": "npm run build --workspace=validator --workspace=api",
     "api": "npm install && npm run start --workspace=api",
     "postinstall": "symlink-dir node_modules/cesium packages/admin-dashboard/node_modules/cesium"
@@ -18,7 +17,6 @@
   ],
   "devDependencies": {
     "@parcel/watcher": "^2.4.0",
-    "pnpm": "^6.16.1",
     "symlink-dir": "^5.2.1"
   }
 }
