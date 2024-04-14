@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "npm run build --workspace=validator && npm run dev --workspaces --if-present",
     "build": "npm run build --workspace=validator --workspace=api",
-    "start": "npm run start --workspace=api",
+    "start": "npm run build --workspace=validator && npm run start --workspace=api",
     "postinstall": "symlink-dir node_modules/cesium packages/admin-dashboard/node_modules/cesium"
   },
   "gitHooks": {
