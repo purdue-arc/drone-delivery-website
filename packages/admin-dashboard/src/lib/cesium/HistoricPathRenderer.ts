@@ -63,7 +63,14 @@ export class HistoricPathRenderer {
 
   /** Fetch the specified number of historical points and convert to Cartesian3 */
   private async fetchHistory(limit: number) {
-    return (await this.runHistoryQuery({variables: {limit}})).drone_telemetry.map(point => Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude, point.altitude));
+    return (await this.runHistoryQuery({variables: {limit}}))
+      .drone_telemetry.map(point =>
+        Cesium.Cartesian3.fromDegrees(
+          point.position.coordinates[0],
+          point.position.coordinates[1],
+          point.position.coordinates[2]
+        )
+      );
   }
 
   /** Convert history entities to Cartesian3 */
