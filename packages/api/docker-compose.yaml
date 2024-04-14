@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  node-app:
+    image: node:18.18.2
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+    command: "npm install && npx houdini pull-schema && npm run start"
