@@ -50,6 +50,11 @@ cp .env.local.sample .env.local
 
 and then fill in the access token variable (no quotes surrounding the token).
 
+**Where to find**
+- Hasura admin secret: Nhost project -> hasura tab
+- Nhost urls: Nhost project ->  `settings/environment-variables`
+- [Cesium token](https://ion.cesium.com/tokens)
+
 ### 3. Run the app
 
 Run `npm install` to get the latest packages and `npm run dev` to start the app.
@@ -58,11 +63,10 @@ Run `npm install` to get the latest packages and `npm run dev` to start the app.
 
 <details>
 <summary>Why?</summary>
-<ul>
-    <li>pnpm: Graphql codegen types are incorrect (reporting generic object)</li>
-    <li>yarn: React is not defined (likely from migrating `package-lock.json` to `yarn.lock`. Oddly, it worked until I applied monorepo change)</li>
-    <li>npm: Initially, wasn't able to find Cesium assets, hence I tried pnpm & yarn. Workaround: postinstall script symlinks</li>
-</ul>
+
+- pnpm: Graphql codegen types are incorrect (reporting generic object)
+- yarn: React is not defined (likely from migrating `package-lock.json` to `yarn.lock`. Oddly, it worked until I applied monorepo change)
+- npm: Initially, wasn't able to find Cesium assets, hence I tried pnpm & yarn. Workaround: postinstall script symlinks
 </details>
 
 ## Building
