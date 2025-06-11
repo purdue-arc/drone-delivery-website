@@ -1,8 +1,10 @@
 import { NhostClient } from "@nhost/nhost-js";
+import { loadEnv } from "vite";
 
+const env = loadEnv("production", process.cwd())
 export const nhost = new NhostClient({
-  authUrl: "https://dd-hasura.purduearc.com/v1/auth",
-  storageUrl: "https://dd-hasura.purduearc.com/v1/storage",
-  graphqlUrl: "https://dd-hasura.purduearc.com/v1/graphql",
-  functionsUrl: "https://dd-hasura.purduearc.com/v1/functions",
+  authUrl: env["VITE_NHOST_AUTH"],
+  storageUrl: env["VITE_NHOST_STORAGE"],
+  graphqlUrl: env["VITE_NHOST_GRAPHQL"],
+  functionsUrl: env["VITE_NHOST_FUNCTIONS"],
 });
