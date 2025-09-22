@@ -9,7 +9,7 @@ This is a [`solid-start`](https://start.solidjs.com) website intended to handle 
 
 It uses [CesiumJS](https://cesium.com/learn/cesiumjs-learn/) as a geospatial rendering library.
 
-![image](https://media.discordapp.net/attachments/1077010721176563732/1206453225767706644/image.png?ex=676051df&is=675f005f&hm=93e9e3d3913f277917957b06eafd0e46750fe87a7f9456e8e96eeca4b8e6a1a8&=&format=webp&quality=lossless&width=1634&height=1001)
+![image](docs/flight-editor.png)
 
 ## Developing
 
